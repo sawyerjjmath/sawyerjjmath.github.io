@@ -25,7 +25,7 @@ tags:
   - Lectures
 featured: true
 links:
-  - type: pre-print
+  - type: preprint
     url: https://zenodo.org/records/16903054
   - type: slides
     url: ""

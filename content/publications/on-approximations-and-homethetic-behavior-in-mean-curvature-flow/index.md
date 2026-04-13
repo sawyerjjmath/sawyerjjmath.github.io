@@ -13,11 +13,10 @@ abstract: |
 tags:
   - Research
 featured: true
-hugoblox:
-  ids:
-    pre-print: "https://doi.org/10.5281/zenodo.17705821"
-projects: []
-slides: ""
+links:
+  - type: preprint
+    url: https://doi.org/10.5281/zenodo.17705821
+
 status: published
 ---
 <!-- Add the paper text or supplementary notes. Markdown, math, and code are supported. -->

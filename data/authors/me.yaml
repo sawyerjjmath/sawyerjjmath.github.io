@@ -29,14 +29,9 @@ interests:
 education:
   - degree: "BA Mathematics"
     institution: "Harvard University"
-    start: "2026"
+    start: "2026-"
     end: "2030"
     summary: ""
-  - degree: "High School Diploma"
-    institution: "Weston High School"
-    start: "2023"
-    end: "2026"
-    summary: "GPA: 4.0 Unweighted"
 experience: []
 skills: []
 languages:

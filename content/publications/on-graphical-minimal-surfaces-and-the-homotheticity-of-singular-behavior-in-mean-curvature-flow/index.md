@@ -28,7 +28,7 @@ links:
   - type: preprint
     url: https://zenodo.org/records/16903054
   - type: slides
-    u{{< slideshow "/slides/JMM_Lecture.pdf" >}}
+    url: ""
   - type: conference
     url: https://meetings.ams.org/math/jmm2026/meetingapp.cgi/Paper/50726
 draft: false

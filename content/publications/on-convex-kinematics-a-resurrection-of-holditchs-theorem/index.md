@@ -1,7 +1,8 @@
 ---
 title: "On Convex Kinematics: A Resurrection of Holditch's Theorem"
 authors:
-  - me, William Balz
+  - me
+  - William Balz
 date: 2025-08-29
 publishDate: 2026-04-13T20:34:53.549Z
 publication_types:

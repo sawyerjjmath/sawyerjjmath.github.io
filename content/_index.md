@@ -42,11 +42,7 @@ sections:
       title: '📚 My Research'
       subtitle: ''
       text: |-
-        Use this area to speak to your mission. I'm a research scientist in the Moonshot team at DeepMind. I blog about machine learning, deep learning, and moonshots.
-
-        I apply a range of qualitative and quantitative methods to comprehensively investigate the role of science and technology in the economy.
-
-        Please reach out to collaborate 😃
+        Sawyer Jacobson is a researcher whose work sits at the intersection of differential geometry and the analysis of partial differential equations. His research is broadly concerned with understanding the behavior of surfaces and geometric objects under natural evolution and constraint — asking questions about when and how geometric structure is preserved, when singularities arise, and how analytical and computational tools can be brought to bear on problems that resist closed-form solution. Alongside this, he has explored classical results in convex kinematics, seeking more intuitive and extensible proofs of foundational theorems. His work is characterized by a drive to connect rigorous theoretical frameworks with concrete geometric insight.
     design:
       columns: '1'
   - block: collection

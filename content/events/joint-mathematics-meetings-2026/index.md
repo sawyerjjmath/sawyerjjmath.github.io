@@ -18,7 +18,7 @@ abstract: >
   with an opportunity to ask questions and discuss the material at the end.
 event_start: 2026-01-07
 event_end: 2026-01-07
-event_all_day: false
+event_all_day: true
 authors:
   - me
 tags:
@@ -27,8 +27,8 @@ featured: false
 image:
   focal_point: Center
 slides: ""
-projects: []
+
 
 ---
 
-<!-- Add the talk outline, prerequisites, and how people can join. -->
+

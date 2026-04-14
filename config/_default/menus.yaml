@@ -16,11 +16,3 @@ main:
     identifier: f895e90d
     url: /#talks
     weight: 30
-  - name: News
-    identifier: 3546ec3f
-    url: /#news
-    weight: 40
-  - name: Experience
-    identifier: 1090f715
-    url: experience/
-    weight: 50

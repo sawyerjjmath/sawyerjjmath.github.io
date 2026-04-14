@@ -3,7 +3,7 @@ title: On Approximations and Homethetic Behavior in Mean Curvature Flow
 authors:
   - me
   - Jeffery Zhang
-date: 2025-04-23
+date: 2026-04-13
 publishDate: 2026-04-13T21:15:23.414Z
 publication_types:
   - article-journal

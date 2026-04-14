@@ -26,6 +26,7 @@ tags:
 featured: false
 image:
   focal_point: Center
+slides: ""
 
 
 

@@ -26,7 +26,7 @@ tags:
 featured: false
 image:
   focal_point: Center
-slides: ""
+slides: "https://sawyerjjmath.github.io/uploads/JMM_Lecture.pdf"
 
 
 ---

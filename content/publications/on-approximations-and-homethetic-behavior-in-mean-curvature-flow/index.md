@@ -23,7 +23,7 @@ tags:
   - Research
 featured: false
 links:
-  - type: Article
+  - type: journal
     url: https://www.parabola.unsw.edu.au/sites/default/files/2026-05/vol62_no1_6.pdf
 status: published
 

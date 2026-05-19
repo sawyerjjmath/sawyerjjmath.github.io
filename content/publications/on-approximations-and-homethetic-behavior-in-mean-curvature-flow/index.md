@@ -1,10 +1,10 @@
 ---
-title: On Approximations and Homethetic Behavior in Mean Curvature Flow
+title: Approximating Minimal Surfaces Through Mean Curvature Flow
 authors:
   - me
   - Jeffery Zhang
-date: 2026-04-13
-publishDate: 2026-04-13T21:15:23.414Z
+date: 2026-05-19
+publishDate: 2026-05-19T21:15:23.414Z
 publication_types:
   - article-journal
 publication: UNSW Syndey Parabola
@@ -18,21 +18,13 @@ abstract: >
   utility by estimating minimal surfaces with complicated boundary conditions,
   while offering visual insights into their evolution under the flow. The paper
   highlights the functionality of graphical mean curvature flow as both a tool
-  for approximation and a geometric lens for studying minimal surfaces. In
-  geometric flows, long-term behavior often includes singularities.
-  Mathematicians classify these as type I or type II according to the rate at
-  which curvature blows up. Due to the nature of infinite curvature, these
-  points require special techniques to analyze. Thus, by deriving and applying
-  Huisken's monotonicity formula as well as a Shi-type estimate, we are able to
-  demonstrate that self-shrinkers serve as precise models for type I
-  singularities. This extends the scope to which mathematicians can analyze
-  these computationally troublesome points.
+  for approximation and a geometric lens for studying minimal surfaces.
 tags:
   - Research
 featured: false
 links:
-  - type: preprint
-    url: https://doi.org/10.5281/zenodo.17705821
+  - type: Article
+    url: https://www.parabola.unsw.edu.au/sites/default/files/2026-05/vol62_no1_6.pdf
 status: published
 
 ---

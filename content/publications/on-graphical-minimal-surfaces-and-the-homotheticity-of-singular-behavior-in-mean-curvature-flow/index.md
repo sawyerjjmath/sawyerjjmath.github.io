@@ -22,7 +22,6 @@ abstract: >
   type I singularities.
 tags:
   - Research
-  - Lectures
 featured: true
 links:
   - type: preprint

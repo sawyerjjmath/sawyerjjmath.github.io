@@ -140,7 +140,6 @@ npx hugoblox create site --template academic-cv
 
 - 💬 [**Discord Community**](https://discord.gg/z8wNYzb)
 - 📚 [**Documentation**](https://docs.hugoblox.com/?utm_source=github&utm_medium=readme)
-- 🐦 [**Follow on X**](https://x.com/MakeOwnable)
 - ⭐ [**Star on GitHub**](https://github.com/HugoBlox/kit)
 
 ---

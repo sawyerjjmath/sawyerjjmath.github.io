@@ -1,0 +1,26 @@
+links:
+  - id: linkedin
+    enable: true
+    url: "https://www.linkedin.com/sharing/share-offsite/?url={url}"
+    icon: "brands/linkedin"
+    title: "Share on LinkedIn"
+  - id: email
+    enable: true
+    url: "mailto:?subject={title}&body=Check this out: {url}"
+    icon: "hero/at-symbol"
+    title: "Share via email"
+  - id: x
+    enable: false
+    url: "https://twitter.com/intent/tweet?url={url}&text={title}"
+    icon: "brands/x"
+    title: "Share on X"
+  - id: facebook
+    enable: false
+    url: "https://www.facebook.com/sharer/sharer.php?u={url}"
+    icon: "brands/facebook"
+    title: "Share on Facebook"
+  - id: whatsapp
+    enable: false
+    url: "https://wa.me/?text={title}%20{url}"
+    icon: "brands/whatsapp"
+    title: "Share on WhatsApp"

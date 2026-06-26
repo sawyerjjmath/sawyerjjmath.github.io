@@ -15,7 +15,7 @@ tags:
   - Research
 featured: false
 links:
-  - type: pdf
+  - type: preprint
     url: https://doi.org/10.5281/zenodo.20924061
 status: published
 ---

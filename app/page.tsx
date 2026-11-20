@@ -26,7 +26,7 @@ const archive: ArchiveItem[] = [
       "A direct uniqueness result for graphical self-shrinkers, obtained by linearizing the governing quasilinear elliptic equation and applying a maximum principle.",
     tags: ["Mean Curvature Flow", "Self-Shrinkers"],
     links: [
-      { label: "PDF", href: "/papers/self-shrinkers-uniqueness.pdf" },
+      { label: "Paper", href: "/papers/self-shrinkers-uniqueness.pdf" },
     ],
   },
   {

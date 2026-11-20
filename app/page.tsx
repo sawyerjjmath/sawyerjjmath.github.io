@@ -21,12 +21,12 @@ const archive: ArchiveItem[] = [
     year: "June 2026",
     status: "Preprint · in peer review",
     title: "Uniqueness of the Dirichlet Problem for Graphical Self-Shrinkers",
-    venue: "Zenodo preprint",
+    venue: "Preprint",
     summary:
       "A direct uniqueness result for graphical self-shrinkers, obtained by linearizing the governing quasilinear elliptic equation and applying a maximum principle.",
     tags: ["Mean Curvature Flow", "Self-Shrinkers"],
     links: [
-      { label: "DOI Record", href: "https://doi.org/10.5281/zenodo.20924061" },
+      { label: "PDF", href: "/papers/self-shrinkers-uniqueness.pdf" },
     ],
   },
   {
@@ -57,7 +57,7 @@ const archive: ArchiveItem[] = [
       "From uniqueness of graphical minimal surfaces to a computational mean-curvature-flow framework—and the self-similar geometry that emerges near Type I singularities.",
     tags: ["Minimal Surfaces", "Mean Curvature Flow", "Self-Shrinkers"],
     links: [
-      { label: "DOI Record", href: "https://zenodo.org/records/16903054" },
+      { label: "Paper", href: "/papers/graphical-minimal-surfaces.pdf" },
       { label: "Slides", href: "/slides/jmm-2026-graphical-minimal-surfaces.pdf" },
       {
         label: "Presentation Record",

@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sawyer Jacobson</title>
+<meta name="description" content="Sawyer Jacobson, mathematics at Harvard. Mean curvature flow, minimal surfaces, and geometric PDE.">
+<meta property="og:title" content="Sawyer Jacobson">
+<meta property="og:description" content="Mathematics at Harvard. Mean curvature flow, minimal surfaces, and geometric PDE.">
+<meta property="og:image" content="https://sawyerjjmath.github.io/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<style>
+  /* ======================= palette (sand) ======================= */
+  :root {
+    --page: #ece6dc; --card: #fffdf9;
+    --text: #2d2a26; --strong: #1f1a14; --soft: #5f574d; --faint: #94897b; --rule: #d9cfbf;
+    --head: #5b3d23; --link: #8c5f3a; --link-hover: #5b3d23; --accent: #8c5f3a; --btn-border: #d6cec2;
+    --box: #f8f4ed; --box-edge: #e2d6c3;
+    --f-bg1: #f7f3ec; --f-bg2: #ede7dd; --f-border: #e4ddd1;
+    --f-ink: #3a342d; --f-soft: #7d7468; --f-faint: rgba(58,52,45,0.12); --f-grid: rgba(58,52,45,0.05);
+    --f-accent: #8c5f3a; --f-fill: rgba(140,95,58,0.10);
+    --f-s0: #d0c0a8; --f-s1: #b3936e; --f-s2: #7d5436;
+    --f-wire: #3a342d; --f-emissive: #000000; --f-ground: #e7dfd2; --f-sky: #ffffff;
+    --f-line-op: 0.2; --f-switch: rgba(255,255,255,0.75); --f-switch-on: #3a342d; --f-switch-on-text: #ffffff;
+    --serif: "Palatino Linotype", Palatino, "Book Antiqua", "TeX Gyre Pagella", "URW Palladio L", Georgia, serif;
+  }
+
+  /* ======================= page ======================= */
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 52px; }
+  body {
+    margin: 0; background: var(--page); color: var(--text);
+    font-family: var(--serif); font-size: 16.5px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--link); text-decoration: none; transition: color 0.15s; }
+  a:hover { color: var(--link-hover); text-decoration: underline; text-underline-offset: 2px; }
+
+  /* thin bar whose name and links fade in once the header scrolls away */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 40px; z-index: 50;
+    display: flex; align-items: center; padding: 0 max(calc(50% - 435px), 24px);
+    background: rgba(255, 253, 249, 0.92); border-bottom: 1px solid rgba(160, 145, 125, 0.28);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .topbar .tb-name { color: var(--head); font-size: 0.95em; letter-spacing: 0.2px; opacity: 0; transition: opacity 0.3s; text-decoration: none; }
+  .topbar nav { margin-left: auto; display: flex; gap: 20px; opacity: 0; transition: opacity 0.3s; }
+  .topbar.show .tb-name, .topbar.show nav { opacity: 1; }
+  .topbar nav a { font-size: 0.84em; color: var(--soft); letter-spacing: 0.2px; }
+  .topbar nav a:hover { color: var(--head); text-decoration: none; }
+
+  .card {
+    max-width: 980px; margin: 0 auto; min-height: 100vh;
+    background: var(--card); padding: 88px 55px 40px;
+    box-shadow: 0 0 0 1px rgba(160, 145, 125, 0.12);
+  }
+
+  /* header: info left, photo right, faint drawing behind the info */
+  .header { display: flex; gap: 38px; align-items: stretch; margin-bottom: 8px; }
+  .info { flex: 1 1 0; position: relative; padding-top: 2px; }
+  .info > * { position: relative; z-index: 1; }
+  .info canvas.wm { position: absolute; inset: -16px -10px -10px -24px; width: calc(100% + 34px); height: calc(100% + 26px); z-index: 0; pointer-events: none; }
+  .info h1 { font-weight: normal; font-size: 2.35em; line-height: 1.25; letter-spacing: -0.3px; color: var(--strong); margin: 0 0 16px; }
+  .bio { margin: 0 0 2px; font-size: 0.95em; color: #3b362f; }
+  .bio-detail { margin: 0 0 2px; padding-left: 6px; font-size: 0.72em; color: #7a7064; }
+  .contact { margin: 16px 0 0; font-size: 0.92em; color: #4a443c; }
+  .links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; font-size: 0.95em; }
+  .links a { font-weight: bold; }
+  .photo {
+    flex: 0 0 230px; overflow: hidden; border-radius: 3px; background: var(--box);
+    box-shadow: 0 2px 12px rgba(60, 40, 20, 0.12); min-height: 240px;
+  }
+  .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+
+  h2 {
+    font-weight: normal; font-size: 1.4em; color: var(--head);
+    margin: 36px 0 16px; padding-bottom: 7px; border-bottom: 1.5px solid var(--rule);
+  }
+  section > p { margin: 0 0 12px; }
+
+  /* papers: collapsible, abstract in a tinted box */
+  details.paper { margin-bottom: 12px; scroll-margin-top: 56px; }
+  details.paper summary { cursor: pointer; list-style: none; padding: 5px 0 3px 22px; position: relative; }
+  details.paper summary::-webkit-details-marker { display: none; }
+  details.paper summary::before {
+    content: "▶"; position: absolute; left: 1px; top: 10px; font-size: 0.65em; color: #857a6c; transition: transform 0.2s;
+  }
+  details.paper[open] summary::before { transform: rotate(90deg); }
+  .ptitle { font-style: italic; color: var(--strong); }
+  .pmeta { display: block; font-size: 0.83em; color: #7a7064; margin-top: 2px; }
+  .abstract {
+    margin: 6px 0 0 22px; padding: 14px 18px 12px; font-size: 0.95em; line-height: 1.72; color: #3b362f;
+    background: var(--box); border-left: 3px solid var(--box-edge); border-radius: 0 4px 4px 0;
+  }
+
+  ul.items { list-style: none; padding: 0; margin: 0; }
+  ul.items > li { position: relative; padding: 4px 0 4px 20px; margin-bottom: 4px; }
+  ul.items > li::before { content: "▸"; position: absolute; left: 2px; top: 4px; color: #a3978a; font-size: 0.9em; }
+  .when { color: #7a7064; }
+
+  footer {
+    margin-top: 56px; padding-top: 14px; border-top: 1px solid var(--rule);
+    font-size: 0.82em; color: var(--faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  /* ======================= figure ======================= */
+  figure { margin: 0; scroll-margin-top: 56px; }
+  .stage {
+    position: relative; height: 520px; overflow: hidden; border-radius: 4px;
+    border: 1px solid var(--f-border);
+    background: radial-gradient(ellipse at 50% 40%, var(--f-bg1) 0%, var(--f-bg2) 100%);
+    color: var(--f-soft); touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  }
+  .stage.drag { cursor: grab; }
+  .stage.drag:active { cursor: grabbing; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .stage canvas.ov { pointer-events: none; }
+  .stage .rd {
+    position: absolute; z-index: 3; pointer-events: none;
+    font-size: 14px; line-height: 1.7; font-variant-numeric: lining-nums tabular-nums;
+  }
+  .stage .rd .v { color: var(--f-ink); }
+  .stage .tl { left: 18px; top: 16px; }
+  .stage .br { right: 18px; bottom: 14px; text-align: right; font-style: italic; }
+
+  .switch {
+    position: absolute; z-index: 4; right: 12px; top: 12px;
+    display: flex; gap: 2px; padding: 3px; border-radius: 4px;
+    background: var(--f-switch); border: 1px solid var(--f-faint);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .switch button {
+    font: inherit; color: var(--f-soft); background: none; border: 0; border-radius: 3px;
+    padding: 4px 11px 5px; cursor: pointer; white-space: nowrap; text-align: left; line-height: 1.25;
+  }
+  .switch button span { display: block; font-size: 14px; }
+  .switch button small { display: block; font-size: 11.5px; opacity: 0.75; font-variant-numeric: lining-nums; }
+  .switch button:hover { color: var(--f-ink); }
+  .switch button[aria-pressed="true"] { background: var(--f-switch-on); color: var(--f-switch-on-text); }
+  .nogl { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; font-style: italic; }
+  .stage.failed .nogl { display: flex; }
+
+  .controls {
+    display: none; flex-wrap: wrap; justify-content: space-between; align-items: center;
+    gap: 10px 24px; padding: 12px 0 0; font-size: 16px; color: var(--soft);
+  }
+  .controls.on { display: flex; }
+  .controls .group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
+  .controls .k { color: var(--faint); }
+  .controls label { display: inline-flex; align-items: center; gap: 10px; }
+  .controls output { font-variant-numeric: lining-nums tabular-nums; color: var(--text); min-width: 3.2em; }
+  .controls input[type=range] { width: 140px; accent-color: var(--accent); }
+  .controls button {
+    font: inherit; font-size: 16px; background: none; border: 0; padding: 2px 0; margin: 0;
+    color: var(--soft); cursor: pointer; border-bottom: 1px solid transparent;
+  }
+  .controls button:hover { color: var(--text); }
+  .controls button[aria-pressed="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  .controls .btn { border: 1px solid var(--btn-border); border-radius: 3px; padding: 4px 13px; color: var(--text); }
+  .controls .btn:hover { border-color: var(--text); }
+
+  figcaption { display: none; font-size: 0.92em; line-height: 1.65; color: var(--soft); margin-top: 14px; }
+  figcaption.on { display: block; }
+  figcaption b { color: var(--text); font-weight: 600; }
+
+
+  .figure-intro { margin: 0 0 14px; color: var(--soft); font-size: 0.95em; }
+
+  @media (max-width: 760px) {
+    body { font-size: 16px; }
+    .topbar { padding: 0 16px; }
+    .topbar nav { gap: 13px; }
+    .topbar nav a.opt { display: none; }
+    .card { padding: 64px 18px 32px; }
+    .header { flex-direction: column; gap: 22px; }
+    .photo { flex: none; width: 150px; min-height: 0; height: 175px; }
+    .info h1 { font-size: 2em; }
+    .stage { height: 480px; margin: 0 -18px; border-radius: 0; border-left: 0; border-right: 0; }
+    .switch { left: 8px; right: 8px; top: 8px; overflow-x: auto; scrollbar-width: none; }
+    .switch button { flex: 1 0 auto; padding: 4px 8px 5px; }
+    .switch button span { font-size: 13px; }
+    .stage .tl { left: 14px; top: 62px; }
+    .stage .br { right: 14px; bottom: 10px; }
+    .stage .rd { font-size: 13px; }
+    .controls input[type=range] { width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <a class="tb-name" href="#top">Sawyer Jacobson</a>
+  <nav>
+    <a href="#research">Research</a>
+    <a href="#talks" class="opt">Talks</a>
+    <a href="#artifacts">Artifacts</a>
+    <a href="resume/sawyer-jacobson-resume.pdf" class="opt">CV</a>
+    <a href="#figures">Figures</a>
+  </nav>
+</div>
+
+<div class="card" id="top">
+
+  <div class="header">
+    <div class="info">
+      <canvas class="wm" id="wm" aria-hidden="true"></canvas>
+      <h1 id="name">Sawyer Jacobson</h1>
+      <p class="bio">Mathematics undergraduate at <a href="https://www.math.harvard.edu/">Harvard</a></p>
+      <p class="bio-detail">A.B. expected 2030</p>
+      <p class="bio">Geometric analysis: mean curvature flow and minimal surfaces</p>
+      <p class="bio-detail">Talk at the Joint Mathematics Meetings, 2026 · Papers in <i>Parabola</i>, 2025 and 2026</p>
+      <div class="contact">
+        <p style="margin:0">Email: <a href="mailto:sawyerjacobson@college.harvard.edu">sawyerjacobson@college.harvard.edu</a></p>
+        <div class="links">
+          <a href="https://scholar.google.com/citations?user=HCaRpkkAAAAJ&amp;hl=en">Google Scholar</a>
+          <a href="https://orcid.org/0009-0009-2775-6127">ORCID</a>
+          <a href="https://www.linkedin.com/in/sawyerjmath/">LinkedIn</a>
+          <a href="resume/sawyer-jacobson-resume.pdf">CV</a>
+        </div>
+      </div>
+    </div>
+    <div class="photo"><img src="assets/sawyer-jacobson.jpg" alt="Portrait of Sawyer Jacobson" width="640" height="738"></div>
+  </div>
+
+
+  <section id="research">
+    <h2>Research</h2>
+
+    <details class="paper" id="ref-1">
+      <summary>
+        <span class="ptitle">Uniqueness of the Dirichlet problem for graphical self-shrinkers</span>, preprint (2026)
+        <span class="pmeta">[<a href="papers/self-shrinkers-uniqueness.pdf">pdf</a>] [<a href="#figures" data-show="shrinkers">figure</a>]</span>
+      </summary>
+      <div class="abstract">
+        A direct uniqueness result for graphical self-shrinkers, obtained by linearizing the governing
+        quasilinear elliptic equation and applying a maximum principle.
+      </div>
+    </details>
+
+    <details class="paper" id="ref-2">
+      <summary>
+        <span class="ptitle">Approximating graphical minimal surfaces through mean curvature flow</span> (with Jeffery Zhang)
+        <span class="pmeta">[<a href="papers/approximating-minimal-surfaces.pdf">pdf</a>] [<a href="https://www.parabola.unsw.edu.au/sites/default/files/2026-05/vol62_no1_6.pdf">journal</a>] [<a href="#figures" data-show="minimal">figure</a>] · <i>Parabola</i> 62, no. 1 (2026)</span>
+      </summary>
+      <div class="abstract">
+        A computational framework for evolving graphical surfaces toward minimality, with simulations testing
+        planarity, rotational symmetry, and complex boundary data.
+      </div>
+    </details>
+
+    <details class="paper" id="ref-3">
+      <summary>
+        <span class="ptitle">On graphical minimal surfaces and the homotheticity of singular behavior in mean curvature flow</span>, Joint Mathematics Meetings (2026)
+        <span class="pmeta">[<a href="papers/graphical-minimal-surfaces.pdf">pdf</a>] [<a href="slides/jmm-2026-graphical-minimal-surfaces.pdf">slides</a>] [<a href="#figures" data-show="round">figure</a>]</span>
+      </summary>
+      <div class="abstract">
+        A self-contained path from graphical minimal-surface theory to computation by mean curvature flow,
+        followed by a study of self-similar models for Type&nbsp;I singularities.
+      </div>
+    </details>
+
+    <details class="paper" id="ref-4">
+      <summary>
+        <span class="ptitle">On convex kinematics: a resurrection of Holditch’s theorem</span> (with William Balz)
+        <span class="pmeta">[<a href="papers/holditch-theorem.pdf">pdf</a>] [<a href="https://www.parabola.unsw.edu.au/sites/default/files/2025-08/vol61_no2_4.pdf">journal</a>] [<a href="#figures" data-show="holditch">figure</a>] · <i>Parabola</i> 61, no. 2 (2025)</span>
+      </summary>
+      <div class="abstract">
+        An intuitive proof of Holditch’s classical area invariant, built from concrete geometry and the
+        complementary perspectives of Green’s and Stewart’s theorems.
+      </div>
+    </details>
+  </section>
+
+  <section id="talks">
+    <h2>Presentations</h2>
+    <ul class="items">
+      <li>
+        Joint Mathematics Meetings, January 2026: <i>On graphical minimal surfaces and the homotheticity of singular
+        behavior in mean curvature flow</i> [<a href="slides/jmm-2026-graphical-minimal-surfaces.pdf">slides</a>]
+        [<a href="https://meetings.ams.org/math/jmm2026/meetingapp.cgi/Paper/50726">abstract</a>]
+      </li>
+    </ul>
+  </section>
+
+  <section id="artifacts">
+    <h2>Other cool artifacts</h2>
+    <details class="paper">
+      <summary>
+        <span class="ptitle">The Essence of Algebra: Groups, Linear Algebra, and Representations</span>, lecture notes (2026)
+        <span class="pmeta">Based on Math&nbsp;55a at Harvard, taught by Joe Harris</span>
+      </summary>
+      <div class="abstract">
+        A book-length account of Harvard’s honors first-year algebra course, in 27 chapters: groups and their
+        quotients, symmetric and free groups, linear algebra over an arbitrary field through Jordan form and
+        the spectral theorem, multilinear algebra, group actions and the Sylow theorems, and the
+        representation theory of finite groups through induced and real representations. The exercises come
+        from the course’s weekly problem sets, with my solutions in the appendix, and a note at the front
+        describes what taking Math&nbsp;55 is like.
+      </div>
+    </details>
+    <ul class="items">
+      <li><a href="problems">Open problems and a monthly puzzle</a></li>
+    </ul>
+  </section>
+
+  <section id="cv">
+    <h2>CV</h2>
+    <ul class="items">
+      <li><a href="resume/sawyer-jacobson-resume.pdf">CV (PDF)</a> <span class="when">· last updated November 2026</span></li>
+    </ul>
+  </section>
+
+  <section id="figures">
+    <h2>Figures</h2>
+    <p class="figure-intro">Live computations from each paper above. Choose one in the corner of the figure, or follow a paper’s [figure] link.</p>
+  <figure id="figure">
+    <div class="stage" id="stage">
+      <canvas class="gl" id="gl"></canvas>
+      <canvas class="ov" id="ov"></canvas>
+      <div class="switch" role="group" aria-label="Choose a figure">
+        <button data-mod="shrinkers" aria-pressed="false"><span>Self-shrinkers</span><small>Paper [1]</small></button>
+        <button data-mod="minimal" aria-pressed="true"><span>Minimal graphs</span><small>Paper [2]</small></button>
+        <button data-mod="round" aria-pressed="false"><span>Round points</span><small>Paper [3]</small></button>
+        <button data-mod="holditch" aria-pressed="false"><span>Holditch</span><small>Paper [4]</small></button>
+      </div>
+      <div class="rd tl" id="rdTL"></div>
+      <div class="rd br" id="rdBR"></div>
+      <div class="nogl">This figure needs WebGL.</div>
+    </div>
+
+    <div class="controls" data-for="shrinkers">
+      <div class="group" role="group" aria-label="Self-shrinker">
+        <span class="k">Shrinker</span>
+        <button data-shape="sphere" aria-pressed="true">Sphere</button>
+        <button data-shape="cylinder" aria-pressed="false">Cylinder</button>
+        <button data-shape="torus" aria-pressed="false">Angenent torus</button>
+      </div>
+      <button class="btn" id="shrinkRestart">Restart</button>
+    </div>
+    <div class="controls on" data-for="minimal">
+      <div class="group" role="group" aria-label="Boundary curve">
+        <span class="k">Boundary</span>
+        <button data-preset="saddle" aria-pressed="true">Saddle</button>
+        <button data-preset="monkey" aria-pressed="false">Monkey saddle</button>
+        <button data-preset="scherk" aria-pressed="false">Scherk</button>
+        <button data-preset="waves" aria-pressed="false">Waves</button>
+      </div>
+      <button class="btn" id="perturb">Perturb the interior</button>
+    </div>
+    <div class="controls" data-for="round">
+      <div class="group" role="group" aria-label="Initial surface">
+        <span class="k">Start from</span>
+        <button data-convex="cigar" aria-pressed="true">Cigar</button>
+        <button data-convex="lens" aria-pressed="false">Lens</button>
+        <button data-convex="capsule" aria-pressed="false">Capsule</button>
+      </div>
+      <button class="btn" id="roundRestart">Restart</button>
+    </div>
+    <div class="controls" data-for="holditch">
+      <div class="group">
+        <label>Chord length <input type="range" id="hc" min="0.6" max="1.3" step="0.01" value="1.0"><output id="hco"></output></label>
+        <label>Split \(a : b\) <input type="range" id="hl" min="0.1" max="0.9" step="0.01" value="0.35"><output id="hlo"></output></label>
+      </div>
+      <button class="btn" id="hnew">New curve</button>
+    </div>
+
+    <figcaption data-for="shrinkers">
+      <b>Self-shrinkers.</b> A surface \(\Sigma\) is a self-shrinker when \(H = \tfrac12\langle x, \nu\rangle\);
+      then \(\Sigma_t = \sqrt{-t}\,\Sigma\) is a mean curvature flow that keeps its shape and collapses to the
+      origin at \(t = 0\). Shown are the sphere of radius \(2\), the cylinder of radius \(\sqrt{2}\), and the
+      Angenent torus. The torus has no closed formula: its profile is found here by shooting from the plane
+      of symmetry and solving for the height at which the curve closes up. Faint lines are rays from the
+      origin, along which every point moves. These are the objects whose graphical Dirichlet problem is
+      studied in <a href="#ref-1">[1]</a>. Drag to rotate.
+    </figcaption>
+    <figcaption class="on" data-for="minimal">
+      <b>Minimal graphs by mean curvature flow.</b> A graph over the square evolves by mean curvature flow
+      with its boundary held fixed,
+      \[ u_t = \Big(\delta_{ij} - \frac{u_i u_j}{1+|Du|^2}\Big)\,u_{ij}, \]
+      solved by finite differences following <a href="#ref-2">[2]</a>; the readouts are measured from the
+      solution as it evolves. Area decreases monotonically and the surface converges to the minimal graph
+      spanning the wire. Perturb the interior and it returns to the same surface, as uniqueness for the
+      Dirichlet problem of the minimal surface equation requires. Shading is \(|H|\). Drag to rotate.
+    </figcaption>
+    <figcaption data-for="round">
+      <b>Convex surfaces shrink to round points.</b> On the left, a convex surface of revolution moves by mean
+      curvature flow and vanishes at a point at time \(T\). On the right, the same flow is rescaled to keep
+      the area of the sphere of radius \(2\), which near \(T\) amounts to magnifying by \(1/\sqrt{T-t}\).
+      The rescaled surfaces converge to that sphere, the self-shrinker modelling the singularity, as in
+      Huisken’s theorem: the singularity is of Type&nbsp;I and asymptotically homothetic
+      <a href="#ref-3">[3]</a>. Shading is the curvature relative to that sphere, which becomes uniform.
+      The extinction time is extrapolated from the computed solution.
+    </figcaption>
+    <figcaption data-for="holditch">
+      <b>Holditch’s theorem.</b> A chord of fixed length slides once around a convex curve, and a point on it
+      splits the chord into lengths \(a\) and \(b\). The point traces a closed curve, and the ring between the
+      two curves always has area \(\pi a b\), whatever the original curve <a href="#ref-4">[4]</a>. The area
+      shown is measured from the traced curve, not computed from the formula.
+    </figcaption>
+  </figure>
+  </section>
+
+  <footer>
+    <span>Sawyer Jacobson · Harvard University</span>
+    <span>Last updated November 2026</span>
+  </footer>
+</div>
+
+<script>
+/* top bar: name and links fade in once the page name scrolls away */
+(() => {
+  const bar = document.getElementById('topbar'), name = document.getElementById('name');
+  new IntersectionObserver(([e]) => bar.classList.toggle('show', !e.isIntersecting), { rootMargin: '-40px 0px 0px 0px' }).observe(name);
+})();
+
+/* header watermark: a nonconvex curve and its curve-shortening flow, drawn once as faint level sets */
+(() => {
+  const cv = document.getElementById('wm');
+  function draw() {
+    const r = cv.getBoundingClientRect(); if (!r.width) return;
+    const d = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = r.width * d; cv.height = r.height * d;
+    const c = cv.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0);
+    const terms = [[2, 0.18, 0.4], [3, 0.22, 1.9], [5, 0.12, 0.7], [4, 0.08, 2.6]];
+    let p = [];
+    for (let i = 0; i < 360; i++) {
+      const th = i / 360 * 2 * Math.PI; let rr = 1;
+      for (const [k, a, ph] of terms) rr += a * Math.cos(k * th + ph);
+      p.push([rr * Math.cos(th), rr * Math.sin(th)]);
+    }
+    const len = (q) => { let L = 0; for (let i = 0; i < q.length; i++) { const a = q[i], b = q[(i + 1) % q.length]; L += Math.hypot(b[0] - a[0], b[1] - a[1]); } return L; };
+    const resample = (q, n) => {
+      const m = q.length, cum = [0];
+      for (let i = 0; i < m; i++) { const a = q[i], b = q[(i + 1) % m]; cum.push(cum[i] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+      const L = cum[m], out = []; let j = 0;
+      for (let k = 0; k < n; k++) { const s = k / n * L; while (j < m - 1 && cum[j + 1] < s) j++; const u = (s - cum[j]) / (cum[j + 1] - cum[j] || 1e-12), a = q[j], b = q[(j + 1) % m]; out.push([a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1])]); }
+      return out;
+    };
+    p = resample(p, 200);
+    const sc = Math.min(r.width, r.height) * 0.42, cx = r.width * 0.36, cy = r.height * 0.52;
+    c.lineWidth = 1;
+    let t = 0, next = 0, steps = 0;
+    while (p.length > 3 && len(p) > 0.05 && steps < 60000) {
+      if (t >= next) {
+        c.strokeStyle = 'rgba(140, 95, 58, 0.13)'; c.beginPath();
+        p.forEach(([x, y], i) => i ? c.lineTo(cx + x * sc * 1.25, cy - y * sc) : c.moveTo(cx + x * sc * 1.25, cy - y * sc));
+        c.closePath(); c.stroke(); next += 0.018;
+      }
+      const n = p.length, h = len(p) / n, dt = 0.22 * h * h, q = new Array(n);
+      for (let i = 0; i < n; i++) { const a = p[(i - 1 + n) % n], b = p[i], e = p[(i + 1) % n]; q[i] = [b[0] + dt * (a[0] - 2 * b[0] + e[0]) / (h * h), b[1] + dt * (a[1] - 2 * b[1] + e[1]) / (h * h)]; }
+      p = q; t += dt; steps++;
+      if (steps % 25 === 0) p = resample(p, Math.max(24, Math.min(200, Math.round(len(p) / 0.015))));
+    }
+  }
+  new ResizeObserver(draw).observe(cv.parentNode);
+})();
+
+/* paper "figure" links: open the paper, switch module, scroll to figures (handled in the figure script) */
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}]})"></script>
+<script>
+(() => {
+/* =====================================================================
+   Shared setup. All figure colors come from the CSS palette above.
+   ===================================================================== */
+const cssv = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COL = {
+  ink: cssv('--f-ink'), soft: cssv('--f-soft'), faint: cssv('--f-faint'), grid: cssv('--f-grid'),
+  accent: cssv('--f-accent'), fill: cssv('--f-fill'),
+  s0: cssv('--f-s0'), s1: cssv('--f-s1'), s2: cssv('--f-s2'),
+  wire: cssv('--f-wire'), emissive: cssv('--f-emissive'), ground: cssv('--f-ground'), sky: cssv('--f-sky'),
+  lineOp: parseFloat(cssv('--f-line-op')) || 0.22,
+};
+const hexRGB = (h) => { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; };
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const stage = document.getElementById('stage');
+const rdTL = document.getElementById('rdTL'), rdBR = document.getElementById('rdBR');
+const ovCanvas = document.getElementById('ov');
+let ov, OW = 0, OH = 0;
+const SERIF = '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif';
+
+function fitOverlay() {
+  const d = Math.min(window.devicePixelRatio || 1, 2);
+  OW = stage.clientWidth; OH = stage.clientHeight;
+  ovCanvas.width = Math.round(OW * d); ovCanvas.height = Math.round(OH * d);
+  ov = ovCanvas.getContext('2d'); ov.setTransform(d, 0, 0, d, 0, 0);
+}
+const lin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+function makeLUT(stops) {
+  const L = new Float32Array(256 * 3);
+  for (let q = 0; q < 256; q++) {
+    const s = q / 255; let k = 0; while (k < stops.length - 2 && s > stops[k + 1][0]) k++;
+    const [p0, c0] = stops[k], [p1, c1] = stops[k + 1], f = Math.min(1, Math.max(0, (s - p0) / (p1 - p0)));
+    for (let c = 0; c < 3; c++) L[q * 3 + c] = lin(c0[c] + (c1[c] - c0[c]) * f);
+  }
+  return L;
+}
+const LUT = makeLUT([[0, hexRGB(COL.s0)], [0.55, hexRGB(COL.s1)], [1, hexRGB(COL.s2)]]);
+const lutSet = (arr, p, s) => { const q = (Math.max(0, Math.min(1, s)) * 255) | 0; arr[p] = LUT[q * 3]; arr[p + 1] = LUT[q * 3 + 1]; arr[p + 2] = LUT[q * 3 + 2]; };
+const parea = (p) => { let s = 0; for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length]; s += a[0] * b[1] - b[0] * a[1]; } return Math.abs(s) / 2; };
+
+let renderer = null;
+const glCanvas = document.getElementById('gl');
+try { if (!window.THREE) throw 0; renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true, alpha: true }); }
+catch (e) { stage.classList.add('failed'); }
+const scene = renderer ? new THREE.Scene() : null;
+const camera = renderer ? new THREE.PerspectiveCamera(28, 1, 0.1, 100) : null;
+let wireMat, lineMat, ghostMat;
+if (renderer) {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  scene.add(new THREE.HemisphereLight(new THREE.Color(COL.sky), new THREE.Color(COL.ground), 0.8));
+  const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(2.5, 4, 2); scene.add(key);
+  const fillL = new THREE.DirectionalLight(0xffffff, 0.3); fillL.position.set(-3, 1, -2); scene.add(fillL);
+  wireMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(COL.wire), roughness: 0.35, metalness: 0.3, emissive: new THREE.Color(COL.emissive) });
+  lineMat = () => new THREE.LineBasicMaterial({ color: new THREE.Color(COL.ink), transparent: true, opacity: COL.lineOp });
+  ghostMat = (op) => new THREE.LineBasicMaterial({ color: new THREE.Color(COL.ink), transparent: true, opacity: op });
+}
+const surfMat = (extra = {}) => new THREE.MeshStandardMaterial(Object.assign({
+  vertexColors: true, side: THREE.DoubleSide, roughness: 0.55, metalness: 0.05,
+  polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+}, extra));
+
+const cam = { yaw: 0.75, pitch: 0.5, radius: 6.9, lookY: -0.3, vyaw: 0 };
+function placeCamera() {
+  const { yaw, pitch, radius, lookY } = cam;
+  camera.position.set(radius * Math.cos(pitch) * Math.sin(yaw), lookY + radius * Math.sin(pitch), radius * Math.cos(pitch) * Math.cos(yaw));
+  camera.lookAt(0, lookY, 0);
+}
+function resize() {
+  fitOverlay();
+  if (!renderer) return;
+  renderer.setSize(OW, OH, false); camera.aspect = OW / OH;
+  camera.fov = OW < 600 ? 38 : 28; camera.updateProjectionMatrix();
+}
+let dragging = false, lastX = 0, lastY = 0;
+stage.addEventListener('pointerdown', (e) => {
+  if (!active || !active.is3D || e.target.closest('.switch')) return;
+  dragging = true; lastX = e.clientX; lastY = e.clientY; cam.vyaw = 0; stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY;
+  if (active.onDrag) return active.onDrag(dx, dy, e.pointerType);
+  cam.vyaw = -dx * 0.006; cam.yaw += cam.vyaw;
+  if (e.pointerType === 'mouse') cam.pitch = Math.min(1.3, Math.max(-0.2, cam.pitch + dy * 0.004));
+});
+const endDrag = () => { dragging = false; };
+stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercancel', endDrag);
+
+// dynamic surface of revolution about the three.js Y axis
+function revolutionMesh(NS, NTH, material) {
+  const pos = new Float32Array(NS * NTH * 3), col = new Float32Array(NS * NTH * 3), ix = [];
+  for (let i = 0; i < NS - 1; i++) for (let k = 0; k < NTH; k++) {
+    const a = i * NTH + k, b = i * NTH + (k + 1) % NTH, c = (i + 1) * NTH + k, d = (i + 1) * NTH + (k + 1) % NTH;
+    ix.push(a, c, b, b, c, d);
+  }
+  const geo = new THREE.BufferGeometry();
+  const pa = new THREE.BufferAttribute(pos, 3), ca = new THREE.BufferAttribute(col, 3);
+  pa.setUsage(THREE.DynamicDrawUsage); ca.setUsage(THREE.DynamicDrawUsage);
+  geo.setAttribute('position', pa); geo.setAttribute('color', ca); geo.setIndex(ix);
+  const mesh = new THREE.Mesh(geo, material);
+  const li = [], pstep = Math.max(1, Math.round((NS - 1) / 12));
+  for (let i = pstep; i < NS - 1; i += pstep) for (let k = 0; k < NTH; k++) li.push(i * NTH + k, i * NTH + (k + 1) % NTH);
+  for (let k = 0; k < NTH; k += NTH / 16) for (let i = 0; i < NS - 1; i++) li.push(i * NTH + k, (i + 1) * NTH + k);
+  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', pa); lg.setIndex(li);
+  const group = new THREE.Group(); group.add(mesh); group.add(new THREE.LineSegments(lg, lineMat()));
+  function set(ax, rad, shade) {
+    for (let i = 0; i < NS; i++) for (let k = 0; k < NTH; k++) {
+      const a = 2 * Math.PI * k / NTH, p = (i * NTH + k) * 3;
+      pos[p] = rad[i] * Math.cos(a); pos[p + 1] = ax[i]; pos[p + 2] = rad[i] * Math.sin(a);
+      lutSet(col, p, shade[i]);
+    }
+    pa.needsUpdate = true; ca.needsUpdate = true; geo.computeVertexNormals();
+  }
+  return { group, set };
+}
+
+/* =====================================================================
+   Self-shrinkers                                     Paper [1]
+   Rotational shrinkers H = <x,ν>/2: profile (x(s), r(s)) at unit speed,
+       x' = cos θ,  r' = sin θ,  θ' = (x sin θ − r cos θ)/2 + cos θ / r.
+   The cylinder r = √2 and the sphere of radius 2 solve this exactly; the
+   Angenent torus is found by shooting from (0, r0) with θ = 0 and bisecting
+   on r0 until the curve returns to x = 0 perpendicularly.
+   ===================================================================== */
+const shrinkers = (() => {
+  const F = (x, r, th) => [Math.cos(th), Math.sin(th), (x * Math.sin(th) - r * Math.cos(th)) / 2 + Math.cos(th) / r];
+  function shoot(r0, ds, keep) {
+    let x = 0, r = r0, th = 0; const pts = keep ? [[x, r, th]] : null;
+    for (let n = 0; n < 40000; n++) {
+      const k1 = F(x, r, th);
+      const k2 = F(x + ds / 2 * k1[0], r + ds / 2 * k1[1], th + ds / 2 * k1[2]);
+      const k3 = F(x + ds / 2 * k2[0], r + ds / 2 * k2[1], th + ds / 2 * k2[2]);
+      const k4 = F(x + ds * k3[0], r + ds * k3[1], th + ds * k3[2]);
+      const xn = x + ds / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+      const rn = r + ds / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+      const tn = th + ds / 6 * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]);
+      if (rn < 1e-3) return null;
+      if (x > 0 && xn <= 0) { const f = x / (x - xn); const end = [0, r + f * (rn - r), th + f * (tn - th)]; if (keep) pts.push(end); return { end, pts }; }
+      x = xn; r = rn; th = tn; if (keep) pts.push([x, r, th]);
+    }
+    return null;
+  }
+  let torusR0 = 0, torusRin = 0;
+  function torusProfile() {
+    let lo = 3.2, hi = 3.4;
+    for (let it = 0; it < 48; it++) { const m = (lo + hi) / 2, s = shoot(m, 2e-3, false); if (s && Math.sin(s.end[2]) > 0) lo = m; else hi = m; }
+    torusR0 = lo;
+    const s = shoot(lo, 2e-3, true); torusRin = s.end[1];
+    const half = s.pts.filter((_, i) => i % 6 === 0 || i === s.pts.length - 1).map(p => [p[0], p[1]]);
+    const loop = half.concat(half.slice(1, -1).reverse().map(p => [-p[0], p[1]]));
+    loop.push(loop[0]);
+    return loop;
+  }
+  const profiles = {
+    sphere: () => { const p = []; for (let i = 0; i <= 120; i++) { const a = Math.PI * i / 120; p.push([2 * Math.cos(a), 2 * Math.sin(a) + 1e-4]); } return p; },
+    cylinder: () => { const p = []; for (let i = 0; i <= 60; i++) p.push([-2.6 + 5.2 * i / 60, Math.SQRT2]); return p; },
+    torus: null,
+  };
+  const size = { sphere: 2, cylinder: 2.6, torus: 3.32 };
+  let shape = 'sphere', t = -1, holdUntil = 0, startAt = 0;
+  const group = renderer ? new THREE.Group() : null, live = renderer ? new THREE.Group() : null;
+  if (renderer) { group.add(live); scene.add(group); group.visible = false; }
+  let parts = [];
+  function build() {
+    if (!renderer) return;
+    parts.forEach(o => { o.parent.remove(o); o.geometry.dispose(); }); parts = [];
+    if (shape === 'torus' && !profiles.torus) { const tp = torusProfile(); profiles.torus = () => tp; }
+    const prof = profiles[shape]();
+    const lathe = new THREE.LatheGeometry(prof.map(([x, r]) => new THREE.Vector2(r, x)), 128);
+    const mesh = new THREE.Mesh(lathe, new THREE.MeshStandardMaterial({
+      color: new THREE.Color(COL.s1), roughness: 0.55, metalness: 0.05, side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+    }));
+    live.add(mesh); parts.push(mesh);
+    const seg = [], P = (x, r, a) => new THREE.Vector3(r * Math.cos(a), x, r * Math.sin(a));
+    for (let m = 0; m < 16; m++) { const a = 2 * Math.PI * m / 16; for (let i = 0; i < prof.length - 1; i++) seg.push(P(prof[i][0], prof[i][1], a), P(prof[i + 1][0], prof[i + 1][1], a)); }
+    const step = Math.max(1, Math.floor(prof.length / 12));
+    for (let i = step; i < prof.length - 1; i += step) for (let k = 0; k < 96; k++) {
+      const a0 = 2 * Math.PI * k / 96, a1 = 2 * Math.PI * (k + 1) / 96; seg.push(P(prof[i][0], prof[i][1], a0), P(prof[i][0], prof[i][1], a1));
+    }
+    const lines = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg), lineMat());
+    live.add(lines); parts.push(lines);
+    const ghost = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg), ghostMat(0.06));
+    group.add(ghost); parts.push(ghost);
+    const rays = [];
+    for (let m = 0; m < 6; m++) { const a = 2 * Math.PI * m / 6 + 0.2; for (let i = 0; i < prof.length; i += step * 3) rays.push(new THREE.Vector3(0, 0, 0), P(prof[i][0], prof[i][1], a)); }
+    const rl = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(rays), ghostMat(0.08));
+    group.add(rl); parts.push(rl);
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.035, 16, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color(COL.ink) }));
+    group.add(dot); parts.push(dot);
+    setCamera();
+  }
+  function setCamera() { Object.assign(cam, { radius: size[shape] * 3.45, lookY: 0, pitch: shape === 'torus' ? 0.62 : 0.35 }); }
+  function setShape(s) { shape = s; build(); restart(); document.querySelectorAll('[data-shape]').forEach(b => b.setAttribute('aria-pressed', b.dataset.shape === s)); }
+  function restart() { t = -1; startAt = 0; holdUntil = 0; }
+  document.querySelectorAll('[data-shape]').forEach(b => b.addEventListener('click', () => setShape(b.dataset.shape)));
+  document.getElementById('shrinkRestart').addEventListener('click', restart);
+  const DUR = 6500;
+  return {
+    is3D: true, group,
+    enter() { if (!parts.length) build(); setCamera(); restart(); },
+    tick(now) {
+      if (!startAt) startAt = now;
+      if (holdUntil) { if (now > holdUntil) restart(); }
+      else { const f = Math.min((now - startAt) / DUR, 1); t = -1 + f * 0.9995; if (f >= 1) holdUntil = now + 1600; }
+      if (reduced && !holdUntil) t = -0.35;
+      const s = Math.sqrt(-t);
+      live.scale.setScalar(Math.max(s, 1e-3));
+      const extra = shape === 'torus'
+        ? `<br>closes at <i>r</i>₀ = <span class="v">${torusR0.toFixed(4)}</span>, inner <i>r</i> = <span class="v">${torusRin.toFixed(4)}</span>`
+        : shape === 'sphere' ? '<br>radius <span class="v">2</span> at <i>t</i> = −1' : '<br>radius <span class="v">√2</span> at <i>t</i> = −1';
+      rdTL.innerHTML = `<i>t</i> = <span class="v">${t.toFixed(3)}</span><br>scale √(−<i>t</i>) = <span class="v">${s.toFixed(3)}</span>${extra}`;
+      rdBR.textContent = shape === 'torus' ? 'profile computed by shooting' : '';
+    },
+  };
+})();
+
+/* =====================================================================
+   Minimal graphs by mean curvature flow             Paper [2]
+   u_t = (δ_ij − u_i u_j/(1+|Du|^2)) u_ij on [-1,1]^2 with Dirichlet data.
+   Explicit differences; the operator's eigenvalues lie in (0,1], so
+   dt = 0.2 h^2 is stable.
+   ===================================================================== */
+const minimal = (() => {
+  const N = 65, h = 2 / (N - 1), dt = 0.2 * h * h, X = (i) => -1 + i * h;
+  let u = new Float64Array(N * N), w = new Float64Array(N * N);
+  const Hf = new Float64Array(N * N);
+  let t = 0, maxH = 0, Href = 1, areaHist = [], converged = false, runStart = 0, holdUntil = 0, cycle = 0, userTouched = false;
+  const presets = {
+    saddle: (x, y) => 0.55 * (x * x - y * y),
+    monkey: (x, y) => 0.42 * (x * x * x - 3 * x * y * y),
+    scherk: (x, y) => 0.62 * Math.tanh(3.2 * (y * y - x * x)),
+    waves:  (x, y) => { const th = Math.atan2(y, x); return 0.34 * Math.sin(4 * th) + 0.16 * Math.cos(2 * th); },
+  };
+  const order = ['saddle', 'monkey', 'scherk', 'waves'];
+  let presetName = 'saddle', g = presets.saddle;
+  function coons() {
+    const c00 = g(-1, -1), c10 = g(1, -1), c01 = g(-1, 1), c11 = g(1, 1);
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const x = X(i), y = X(j), s = (x + 1) / 2, r = (y + 1) / 2;
+      u[j * N + i] = (1 - r) * g(x, -1) + r * g(x, 1) + (1 - s) * g(-1, y) + s * g(1, y)
+        - ((1 - s) * (1 - r) * c00 + s * (1 - r) * c10 + (1 - s) * r * c01 + s * r * c11);
+    }
+    w.set(u);
+  }
+  function perturb() {
+    const bumps = [];
+    for (let b = 0; b < 5; b++) bumps.push({
+      cx: (Math.random() * 2 - 1) * 0.6, cy: (Math.random() * 2 - 1) * 0.6,
+      s: 0.18 + Math.random() * 0.22, a: (Math.random() < 0.5 ? -1 : 1) * (0.25 + Math.random() * 0.35),
+    });
+    for (let j = 1; j < N - 1; j++) for (let i = 1; i < N - 1; i++) {
+      const x = X(i), y = X(j); let d = 0;
+      for (const b of bumps) d += b.a * Math.exp(-((x - b.cx) ** 2 + (y - b.cy) ** 2) / (2 * b.s * b.s));
+      u[j * N + i] += d * (1 - x * x) * (1 - y * y) * 1.6;
+    }
+    w.set(u); t = 0; areaHist = []; converged = false; runStart = 0;
+    sweep(); Href = Math.max(maxH * 0.45, 0.3);
+  }
+  function sweep() {
+    let m = 0;
+    const ih2 = 1 / (h * h), i2h = 1 / (2 * h), i4h2 = 1 / (4 * h * h);
+    for (let j = 1; j < N - 1; j++) for (let i = 1; i < N - 1; i++) {
+      const k = j * N + i;
+      const ux = (u[k + 1] - u[k - 1]) * i2h, uy = (u[k + N] - u[k - N]) * i2h;
+      const uxx = (u[k + 1] - 2 * u[k] + u[k - 1]) * ih2, uyy = (u[k + N] - 2 * u[k] + u[k - N]) * ih2;
+      const uxy = (u[k + N + 1] - u[k + N - 1] - u[k - N + 1] + u[k - N - 1]) * i4h2;
+      const W2 = 1 + ux * ux + uy * uy;
+      const rhs = uxx + uyy - (ux * ux * uxx + 2 * ux * uy * uxy + uy * uy * uyy) / W2;
+      w[k] = u[k] + dt * rhs;
+      const a = Math.abs(rhs / Math.sqrt(W2)); Hf[k] = a; if (a > m) m = a;
+    }
+    const tmp = u; u = w; w = tmp; t += dt; maxH = m;
+  }
+  function area() {
+    let A = 0;
+    for (let j = 0; j < N - 1; j++) for (let i = 0; i < N - 1; i++) {
+      const k = j * N + i;
+      const ux = (u[k + 1] - u[k] + u[k + N + 1] - u[k + N]) / (2 * h);
+      const uy = (u[k + N] - u[k] + u[k + N + 1] - u[k + 1]) / (2 * h);
+      A += Math.sqrt(1 + ux * ux + uy * uy);
+    }
+    return A * h * h;
+  }
+  const group = renderer ? new THREE.Group() : null;
+  let posAttr, colAttr, geo, pos, col, wire = null;
+  if (renderer) {
+    pos = new Float32Array(N * N * 3); col = new Float32Array(N * N * 3);
+    const idx = [];
+    for (let j = 0; j < N - 1; j++) for (let i = 0; i < N - 1; i++) { const a = j * N + i, b = a + 1, c = a + N, d = c + 1; idx.push(a, c, b, b, c, d); }
+    geo = new THREE.BufferGeometry();
+    posAttr = new THREE.BufferAttribute(pos, 3); posAttr.setUsage(THREE.DynamicDrawUsage);
+    colAttr = new THREE.BufferAttribute(col, 3); colAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('position', posAttr); geo.setAttribute('color', colAttr); geo.setIndex(idx);
+    group.add(new THREE.Mesh(geo, surfMat()));
+    const li = [];
+    for (let j = 0; j < N; j += 4) for (let i = 0; i < N - 1; i++) li.push(j * N + i, j * N + i + 1);
+    for (let i = 0; i < N; i += 4) for (let j = 0; j < N - 1; j++) li.push(j * N + i, (j + 1) * N + i);
+    const lg = new THREE.BufferGeometry(); lg.setAttribute('position', posAttr); lg.setIndex(li);
+    group.add(new THREE.LineSegments(lg, lineMat()));
+    scene.add(group); group.visible = false;
+  }
+  function buildWire() {
+    if (!renderer) return;
+    if (wire) { group.remove(wire); wire.geometry.dispose(); }
+    const pts = [], edge = (i, j) => pts.push(new THREE.Vector3(X(i), u[j * N + i], X(j)));
+    for (let i = 0; i < N - 1; i++) edge(i, 0);
+    for (let j = 0; j < N - 1; j++) edge(N - 1, j);
+    for (let i = N - 1; i > 0; i--) edge(i, N - 1);
+    for (let j = N - 1; j > 0; j--) edge(0, j);
+    wire = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true, 'centripetal'), 512, 0.012, 10, true), wireMat);
+    group.add(wire);
+  }
+  function upload() {
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const k = j * N + i, p = k * 3;
+      pos[p] = X(i); pos[p + 1] = u[k]; pos[p + 2] = X(j);
+      const s = Hf[k] / Href; lutSet(col, p, s > 1 ? 1 : Math.sqrt(s));
+    }
+    posAttr.needsUpdate = true; colAttr.needsUpdate = true; geo.computeVertexNormals();
+  }
+  function setPreset(name) {
+    presetName = name; g = presets[name]; coons(); perturb(); buildWire();
+    document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', b.dataset.preset === name));
+  }
+  const clock = (s) => 0.02 * (Math.exp(0.55 * s) - 1);
+  function simulate(now) {
+    if (!runStart) runStart = now;
+    const goal = reduced ? Infinity : clock((now - runStart) / 1000), t0 = performance.now();
+    while (!converged && t < goal && performance.now() - t0 < (reduced ? 200 : 9)) {
+      for (let s = 0; s < 20; s++) sweep();
+      if (maxH < 2.5e-3 || t > 6) converged = true;
+    }
+  }
+  function drawOverlay() {
+    const x0 = 18, W = 170, H = 42, y0 = OH - 14 - 20 - H;
+    ov.strokeStyle = COL.faint; ov.lineWidth = 1;
+    ov.beginPath(); ov.moveTo(x0, y0 + H + 0.5); ov.lineTo(x0 + W, y0 + H + 0.5); ov.stroke();
+    if (areaHist.length > 1) {
+      const lo = Math.min(...areaHist), hi = Math.max(areaHist[0], lo + 1e-6), tmax = Math.max(areaHist.length - 1, 120);
+      ov.strokeStyle = COL.accent; ov.lineWidth = 1.5; ov.beginPath();
+      areaHist.forEach((a, n) => { const x = x0 + (n / tmax) * (W - 2) + 1, y = y0 + 3 + (1 - (a - lo) / (hi - lo)) * (H - 8); n ? ov.lineTo(x, y) : ov.moveTo(x, y); });
+      ov.stroke();
+    }
+    ov.fillStyle = COL.soft; ov.font = `13px ${SERIF}`; ov.fillText('Area of the graph', x0, y0 + H + 16);
+    const lw = OW < 600 ? 90 : 120, lx = OW - 18 - lw, ly = OH - 14 - 24;
+    const gr = ov.createLinearGradient(lx, 0, lx + lw, 0);
+    gr.addColorStop(0, COL.s0); gr.addColorStop(0.55, COL.s1); gr.addColorStop(1, COL.s2);
+    ov.fillStyle = gr; ov.fillRect(lx, ly, lw, 5);
+    ov.fillStyle = COL.soft; ov.fillText('|H| = 0', lx, ly + 19);
+    ov.textAlign = 'right'; ov.fillText('large', lx + lw, ly + 19); ov.textAlign = 'start';
+  }
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => { userTouched = true; setPreset(b.dataset.preset); }));
+  document.getElementById('perturb').addEventListener('click', () => { userTouched = true; perturb(); });
+  if (renderer) setPreset('saddle');
+  return {
+    is3D: true, group,
+    enter() { Object.assign(cam, { radius: 6.9, lookY: -0.3, pitch: 0.5, yaw: 0.75 }); },
+    tick(now) {
+      if (!converged) { simulate(now); if (converged) holdUntil = now + 4500; }
+      else if (!userTouched && !reduced && now > holdUntil) {
+        cycle++; if (cycle % 2 === 0) setPreset(order[(order.indexOf(presetName) + 1) % order.length]); else perturb();
+      }
+      const A = area(); areaHist.push(A); if (areaHist.length > 600) areaHist.splice(1, 1);
+      upload(); drawOverlay();
+      rdTL.innerHTML = `<i>t</i> = <span class="v">${t.toFixed(3)}</span><br>Area = <span class="v">${A.toFixed(4)}</span><br>` +
+        `max |<i>H</i>| = <span class="v">${maxH < 1e-3 ? maxH.toExponential(1) : maxH.toFixed(3)}</span>` +
+        (converged ? '<br><i>minimal graph reached</i>' : '');
+      rdBR.textContent = '';
+    },
+  };
+})();
+
+/* =====================================================================
+   Round points (Huisken)                            Paper [3]
+   Axisymmetric convex surface with profile in polar form
+   P(ψ) = R(ψ)(cos ψ, sin ψ), ψ ∈ [0, π], axis along ψ = 0. MCF reads
+       R_t = −H S / R,   S = √(R² + R_ψ²),   H = κ₁ + κ₂,
+   κ₁ = (R² + 2R_ψ² − R R_ψψ)/S³,  κ₂ = (R sin ψ − R_ψ cos ψ)/(S R sin ψ),
+   with κ₂ = κ₁ at the poles. The surface is symmetric about its center,
+   so it shrinks to that point. The whole flow is computed first.
+   ===================================================================== */
+const round = (() => {
+  const N = 241, d = Math.PI / (N - 1), STRIDE = 3, NS = (N - 1) / STRIDE + 1, NTH = 64;
+  const psi = Float64Array.from({ length: N }, (_, i) => i * d);
+  const shapes = {
+    cigar: (c, s) => 1 / Math.sqrt((c / 1.8) ** 2 + (s / 0.8) ** 2),
+    lens: (c, s) => 1 / Math.sqrt((c / 0.6) ** 2 + (s / 1.4) ** 2),
+    capsule: (c, s) => 1 / Math.pow((Math.abs(c) / 1.5) ** 4 + (Math.abs(s) / 0.85) ** 4, 0.25),
+  };
+  let shape = 'cigar', snaps = [], T = 1, idx = 0, last = 0, holdUntil = 0;
+  const cache = {};
+  function curvature(R, Hout, Sout) {
+    for (let i = 0; i < N; i++) {
+      let Rp, Rpp;
+      if (i === 0) { Rp = 0; Rpp = 2 * (R[1] - R[0]) / (d * d); }
+      else if (i === N - 1) { Rp = 0; Rpp = 2 * (R[N - 2] - R[N - 1]) / (d * d); }
+      else { Rp = (R[i + 1] - R[i - 1]) / (2 * d); Rpp = (R[i + 1] - 2 * R[i] + R[i - 1]) / (d * d); }
+      const S = Math.sqrt(R[i] * R[i] + Rp * Rp);
+      const k1 = (R[i] * R[i] + 2 * Rp * Rp - R[i] * Rpp) / (S * S * S);
+      const k2 = (i === 0 || i === N - 1) ? k1 : (R[i] * Math.sin(psi[i]) - Rp * Math.cos(psi[i])) / (S * R[i] * Math.sin(psi[i]));
+      Hout[i] = k1 + k2; Sout[i] = S;
+    }
+  }
+  function area(R) {
+    let A = 0;
+    for (let i = 0; i < N - 1; i++) {
+      const Rm = (R[i] + R[i + 1]) / 2, Rp = (R[i + 1] - R[i]) / d, pm = psi[i] + d / 2;
+      A += 2 * Math.PI * Rm * Math.sin(pm) * Math.sqrt(Rm * Rm + Rp * Rp) * d;
+    }
+    return A;
+  }
+  function compute() {
+    if (!cache[shape]) {
+      const R = Float64Array.from(psi, p => shapes[shape](Math.cos(p), Math.sin(p)));
+      const Hh = new Float64Array(N), S = new Float64Array(N);
+      const A0 = area(R), q = Math.pow(2e-4, 1 / 90), T0 = A0 / (16 * Math.PI);
+      let t = 0, nextT = 0, nextA = A0 * 1.01, steps = 0;
+      const list = [];
+      const record = (A) => {
+        curvature(R, Hh, S);
+        let rmin = Infinity, rmax = 0; for (let i = 0; i < N; i++) { if (R[i] < rmin) rmin = R[i]; if (R[i] > rmax) rmax = R[i]; }
+        const prof = new Float32Array(NS), hp = new Float32Array(NS);
+        for (let i = 0; i < NS; i++) { prof[i] = R[i * STRIDE]; hp[i] = Hh[i * STRIDE]; }
+        list.push({ t, A, rmin, rmax, prof, hp });
+      };
+      while (true) {
+        const A = area(R);
+        if (t >= nextT || A <= nextA) {
+          record(A);
+          while (nextT <= t) nextT += T0 / 110;
+          while (nextA >= A) nextA *= q;
+        }
+        if (A < A0 * 2e-4 || steps > 4e5) break;
+        curvature(R, Hh, S);
+        let rmin = Infinity; for (let i = 0; i < N; i++) if (R[i] < rmin) rmin = R[i];
+        const dt = 0.2 * (rmin * d) ** 2;
+        for (let i = 0; i < N; i++) R[i] -= dt * Hh[i] * S[i] / R[i];
+        t += dt; steps++;
+      }
+      // model-free extinction time: extrapolate area linearly over the final stretch
+      const a = list.find(s => s.A <= A0 * 0.01) || list[list.length - 2], b = list[list.length - 1];
+      cache[shape] = { snaps: list, T: b.t + b.A * (b.t - a.t) / (a.A - b.A) };
+    }
+    snaps = cache[shape].snaps; T = cache[shape].T; idx = 0; holdUntil = 0;
+  }
+  const group = renderer ? new THREE.Group() : null;
+  let left, right;
+  const tilt = { x: 0.25, y: 0 };
+  if (renderer) {
+    left = revolutionMesh(NS, NTH, surfMat()); right = revolutionMesh(NS, NTH, surfMat());
+    group.add(left.group); group.add(right.group);
+    const seg = [], P = (th, ph) => new THREE.Vector3(2 * Math.sin(th) * Math.cos(ph), 2 * Math.cos(th), 2 * Math.sin(th) * Math.sin(ph));
+    for (let m = 0; m < 12; m++) { const ph = 2 * Math.PI * m / 12; for (let i = 0; i < 48; i++) seg.push(P(Math.PI * i / 48, ph), P(Math.PI * (i + 1) / 48, ph)); }
+    for (let j = 1; j < 8; j++) { const th = Math.PI * j / 8; for (let k = 0; k < 96; k++) seg.push(P(th, 2 * Math.PI * k / 96), P(th, 2 * Math.PI * (k + 1) / 96)); }
+    right.group.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg), ghostMat(0.1)));
+    scene.add(group); group.visible = false;
+  }
+  const ax = new Float64Array(NS), rad = new Float64Array(NS), sh = new Float64Array(NS);
+  function show(s) {
+    const k = Math.sqrt(16 * Math.PI / s.A); // normalize the area to that of the sphere of radius 2
+    for (let i = 0; i < NS; i++) {
+      const p = i * STRIDE * d;
+      ax[i] = s.prof[i] * Math.cos(p); rad[i] = Math.max(s.prof[i] * Math.sin(p), 0);
+      sh[i] = 0.5 + 0.9 * (s.hp[i] / k - 1); // curvature relative to the sphere of radius 2, where H = 1
+    }
+    left.set(ax, rad, sh);
+    for (let i = 0; i < NS; i++) { ax[i] *= k; rad[i] *= k; }
+    right.set(ax, rad, sh);
+  }
+  function layout() {
+    if (!renderer) return;
+    const narrow = OW < 600;
+    left.group.position.set(narrow ? 0 : -2.45, narrow ? 2.4 : 0, 0);
+    right.group.position.set(narrow ? 0 : 2.05, narrow ? -1.9 : 0, 0);
+    Object.assign(cam, { radius: narrow ? 17 : 12.5, lookY: 0, pitch: 0.12, yaw: 0, vyaw: 0 });
+  }
+  function labels() {
+    const lab = (obj, text, dy) => {
+      const v = new THREE.Vector3(); obj.getWorldPosition(v); v.y += dy; v.project(camera);
+      ov.fillStyle = COL.soft; ov.font = `italic 13.5px ${SERIF}`; ov.textAlign = 'center';
+      ov.fillText(text, (v.x + 1) / 2 * OW, (1 - v.y) / 2 * OH); ov.textAlign = 'start';
+    };
+    lab(left.group, 'the flow', OW < 600 ? -2.0 : -2.4);
+    lab(right.group, 'rescaled', -2.5);
+  }
+  function setShape(s) {
+    shape = s; compute();
+    document.querySelectorAll('[data-convex]').forEach(b => b.setAttribute('aria-pressed', b.dataset.convex === s));
+  }
+  document.querySelectorAll('[data-convex]').forEach(b => b.addEventListener('click', () => setShape(b.dataset.convex)));
+  document.getElementById('roundRestart').addEventListener('click', () => { idx = 0; holdUntil = 0; });
+  return {
+    is3D: true, group, autoRotate: false, layout,
+    enter() { if (!snaps.length) compute(); layout(); idx = 0; holdUntil = 0; },
+    onDrag(dx, dy) { tilt.y += dx * 0.008; tilt.x = Math.max(-1.2, Math.min(1.2, tilt.x + dy * 0.006)); },
+    tick(now) {
+      if (holdUntil) { if (now > holdUntil) { idx = 0; holdUntil = 0; } }
+      else if (now - last > 40) { last = now; idx++; if (idx >= snaps.length - 1) { idx = snaps.length - 1; holdUntil = now + 2500; } }
+      if (reduced && !holdUntil) idx = Math.floor(snaps.length * 0.8);
+      const s = snaps[idx]; show(s);
+      if (!dragging && !reduced) tilt.y += 0.004;
+      for (const g of [left.group, right.group]) g.rotation.set(tilt.x, tilt.y, 0);
+      labels();
+      const k = 1 / Math.sqrt(Math.max(T - s.t, 1e-12));
+      rdTL.innerHTML = `<i>t</i> / <i>T</i> = <span class="v">${(s.t / T).toFixed(4)}</span><br>` +
+        `<i>R</i><sub>max</sub> / <i>R</i><sub>min</sub> = <span class="v">${(s.rmax / s.rmin).toFixed(4)}</span> → 1<br>` +
+        `<i>R</i> / √(<i>T</i> − <i>t</i>) ∈ [<span class="v">${(s.rmin * k).toFixed(2)}</span>, <span class="v">${(s.rmax * k).toFixed(2)}</span>] → 2`;
+      rdBR.textContent = '';
+    },
+  };
+})();
+
+/* =====================================================================
+   Holditch's theorem                                Paper [4]
+   For A on the curve, B is the next point along the curve at chord
+   distance c, and Q = A + λ(B − A). The ring area is measured by the
+   shoelace formula on the traced curve.
+   ===================================================================== */
+const holditch = (() => {
+  const sc = document.getElementById('hc'), sl = document.getElementById('hl');
+  const co = document.getElementById('hco'), lo = document.getElementById('hlo');
+  const M = 1600;
+  let curve = [], As = [], Bs = [], Qs = [], ring = 0, chord = 1, lam = 0.35, k = 0, done = false;
+  const convex = (p) => { const n = p.length; for (let i = 0; i < n; i++) { const a = p[(i - 1 + n) % n], b = p[i], c = p[(i + 1) % n]; if ((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]) <= 0) return false; } return true; };
+  function newCurve() {
+    for (let tries = 0; tries < 200; tries++) {
+      const c1 = Math.random() * 0.2, c2 = Math.random() * 0.07, c3 = Math.random() * 0.03;
+      const p1 = Math.random() * 6.283, p2 = Math.random() * 6.283, p3 = Math.random() * 6.283, sx = 1.1 + Math.random() * 0.25;
+      const p = [];
+      for (let i = 0; i < M; i++) {
+        const th = i / M * 2 * Math.PI, r = 1 + c1 * Math.cos(2 * th + p1) + c2 * Math.sin(3 * th + p2) + c3 * Math.cos(4 * th + p3);
+        p.push([sx * r * Math.cos(th), r * Math.sin(th)]);
+      }
+      if (convex(p)) { curve = p; return; }
+    }
+  }
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  function trace() {
+    chord = +sc.value; lam = +sl.value; co.textContent = chord.toFixed(2); lo.textContent = `${lam.toFixed(2)} : ${(1 - lam).toFixed(2)}`;
+    As = []; Bs = []; Qs = []; let j = 1;
+    for (let i = 0; i < M; i++) {
+      if (j <= i) j = i + 1;
+      while (dist(curve[j % M], curve[i]) < chord && j < i + M) j++;
+      const p = curve[(j - 1) % M], q = curve[j % M], A = curve[i];
+      let a0 = 0, a1 = 1;
+      for (let it = 0; it < 40; it++) { const m = (a0 + a1) / 2; dist([p[0] + m * (q[0] - p[0]), p[1] + m * (q[1] - p[1])], A) < chord ? a0 = m : a1 = m; }
+      const B = [p[0] + a0 * (q[0] - p[0]), p[1] + a0 * (q[1] - p[1])];
+      As.push(A); Bs.push(B); Qs.push([A[0] + lam * (B[0] - A[0]), A[1] + lam * (B[1] - A[1])]);
+    }
+    ring = parea(curve) - parea(Qs); k = 0; done = reduced;
+  }
+  function draw() {
+    const half = 1.55, s = Math.min(OW, OH - 70) / 2 / half, cx = OW / 2, cy = OH / 2 + (OW < 600 ? 22 : 10);
+    const X = (x) => cx + x * s, Y = (y) => cy - y * s;
+    const path = (pts, close) => { ov.beginPath(); pts.forEach((p, i) => i ? ov.lineTo(X(p[0]), Y(p[1])) : ov.moveTo(X(p[0]), Y(p[1]))); if (close) ov.closePath(); };
+    const a = lam * chord, b = (1 - lam) * chord;
+    if (done) {
+      ov.beginPath();
+      curve.forEach((p, i) => i ? ov.lineTo(X(p[0]), Y(p[1])) : ov.moveTo(X(p[0]), Y(p[1]))); ov.closePath();
+      Qs.forEach((p, i) => i ? ov.lineTo(X(p[0]), Y(p[1])) : ov.moveTo(X(p[0]), Y(p[1]))); ov.closePath();
+      ov.fillStyle = COL.fill; ov.fill('evenodd');
+    }
+    path(curve, true); ov.strokeStyle = COL.ink; ov.lineWidth = 1.5; ov.stroke();
+    const upto = done ? M : Math.floor(k);
+    if (upto > 1) { path(Qs.slice(0, upto), done); ov.strokeStyle = COL.accent; ov.lineWidth = 2; ov.stroke(); }
+    const i = Math.floor(k) % M, A = As[i], B = Bs[i], Q = Qs[i];
+    ov.strokeStyle = COL.soft; ov.lineWidth = 1.2; ov.beginPath(); ov.moveTo(X(A[0]), Y(A[1])); ov.lineTo(X(B[0]), Y(B[1])); ov.stroke();
+    ov.fillStyle = COL.ink; for (const p of [A, B]) { ov.beginPath(); ov.arc(X(p[0]), Y(p[1]), 3, 0, 2 * Math.PI); ov.fill(); }
+    ov.fillStyle = COL.accent; ov.beginPath(); ov.arc(X(Q[0]), Y(Q[1]), 4.5, 0, 2 * Math.PI); ov.fill();
+    const nx = -(B[1] - A[1]) / chord, ny = (B[0] - A[0]) / chord, off = 13 / s;
+    ov.fillStyle = COL.soft; ov.font = `italic 15px ${SERIF}`; ov.textAlign = 'center'; ov.textBaseline = 'middle';
+    ov.fillText('a', X((A[0] + Q[0]) / 2 + nx * off), Y((A[1] + Q[1]) / 2 + ny * off));
+    ov.fillText('b', X((Q[0] + B[0]) / 2 + nx * off), Y((Q[1] + B[1]) / 2 + ny * off));
+    ov.textAlign = 'start'; ov.textBaseline = 'alphabetic';
+    rdTL.innerHTML = `π<i>ab</i> = <span class="v">${(Math.PI * a * b).toFixed(5)}</span><br>ring area = <span class="v">${done ? ring.toFixed(5) : '…'}</span>`;
+    rdBR.textContent = done ? 'traced once around' : '';
+  }
+  sc.addEventListener('input', trace); sl.addEventListener('input', trace);
+  document.getElementById('hnew').addEventListener('click', () => { newCurve(); trace(); });
+  newCurve(); trace();
+  return {
+    is3D: false,
+    enter() {},
+    tick() { if (!done) { k += M / 300; if (k >= M) { done = true; k = 0; } } else k += M / 900; draw(); },
+  };
+})();
+
+/* =====================================================================
+   Switching and the main loop
+   ===================================================================== */
+const MODULES = { shrinkers, minimal, round, holditch };
+let active = null, activeName = '';
+function select(name) {
+  if (name === activeName) return;
+  stage.classList.toggle('failed', !renderer && MODULES[name].is3D);
+  activeName = name; active = MODULES[name];
+  for (const [n, m] of Object.entries(MODULES)) if (m.group) m.group.visible = n === name;
+  glCanvas.style.visibility = active.is3D ? 'visible' : 'hidden';
+  stage.classList.toggle('drag', !!active.is3D);
+  document.querySelectorAll('.switch button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mod === name));
+  document.querySelectorAll('[data-for]').forEach(el => el.classList.toggle('on', el.dataset.for === name));
+  if (!(active.is3D && !renderer)) active.enter();
+}
+document.querySelectorAll('.switch button').forEach(b => b.addEventListener('click', () => select(b.dataset.mod)));
+document.querySelectorAll('[data-show]').forEach(a => a.addEventListener('click', () => select(a.dataset.show)));
+
+let visible = true, lastTime = 0;
+new IntersectionObserver((es) => { visible = es[0].isIntersecting; }, { rootMargin: '80px' }).observe(stage);
+new ResizeObserver(() => { resize(); if (active && active.layout) active.layout(); }).observe(stage);
+fitOverlay(); resize();
+const fromHash = location.hash.slice(1);
+select(MODULES[fromHash] ? fromHash : 'minimal');
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dtw = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 0; lastTime = now;
+  if (!visible || !active) return;
+  ov.clearRect(0, 0, OW, OH);
+  if (active.is3D && !renderer) return;
+  if (active.is3D) { // place the camera first so overlay labels project correctly
+    if (!dragging) { cam.vyaw *= 0.95; cam.yaw += cam.vyaw + (reduced || active.autoRotate === false ? 0 : 0.07 * dtw); }
+    placeCamera(); camera.updateMatrixWorld();
+  }
+  active.tick(now);
+  if (active.is3D) renderer.render(scene, camera);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

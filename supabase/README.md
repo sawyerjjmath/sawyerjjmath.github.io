@@ -101,7 +101,7 @@ update qi_private.answers set max_seals = 3 where instrument = 'IV';
 update qi_private.progress set display_name = null where display_name = 'Offending Name';
 ```
 
-If you edit the limits, also update the sentence "five for the first, four for the second…" near the top of the puzzle page.
+The page reads the limits from the server, so nothing on the page needs changing.
 
 ## What this does and doesn't prevent
 

@@ -5,6 +5,6 @@
 // Both are safe to publish: the database only allows what supabase/quiet-instruments.sql permits.
 // While either is empty, the puzzle page shows "the room opens soon".
 window.QI_CONFIG = {
-  url: "",
-  key: ""
+  url: "https://hygggrqizooxmqkvifmv.supabase.co",
+  key: "sb_publishable_hixUGl81y4KkYLVsUzpFWQ_-mMIS8Ou"
 };

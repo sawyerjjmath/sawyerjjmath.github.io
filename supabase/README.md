@@ -15,9 +15,13 @@ About 20 minutes, once.
 
 1. In the dashboard, open **SQL Editor → New query**.
 2. Paste the whole of [`quiet-instruments.sql`](quiet-instruments.sql) and click **Run**.
+3. In a new query, paste the whole of your private seed, `quiet-instruments.private.sql`, and click **Run**.
 
-This creates a private `qi_private` schema (answers, progress, every seal attempt) that the browser
-cannot read, plus four functions the page calls. Running it again later is safe.
+The first file creates a private `qi_private` schema (progress, every seal attempt) that the browser
+cannot read, plus the functions the page calls. It contains no answers, so it is safe to keep public.
+The private seed loads the answers and any content players must earn. **Never commit it**: this
+repository is public. `.gitignore` already ignores `*.private.sql`, so keep it out of the repo or in
+a password manager. Running either file again later is safe.
 
 ## 3. Let it send email
 
@@ -77,9 +81,10 @@ In **SQL Editor**:
 
 ```sql
 -- who has played, how far they got, and when they solved it
-select u.email, p.started_at, p.sealed, p.used, p.solved_at, p.display_name
+select u.email, p.started_at, p.sealed, p.used, p.solved_at, p.display_name,
+       p.v_sealed, p.v_used, p.crowned_at
 from qi_private.progress p join auth.users u on u.id = p.user_id
-order by p.solved_at nulls last, p.started_at;
+order by p.crowned_at nulls last, p.solved_at nulls last, p.started_at;
 
 -- every seal attempt
 select u.email, g.instrument, g.guess, g.correct, g.at
@@ -90,7 +95,7 @@ order by g.at desc;
 ## Common changes
 
 ```sql
--- reset a player (e.g. your own test run)
+-- reset a player (e.g. your own test run); this also clears any crown
 delete from qi_private.progress where user_id = (select id from auth.users where email = 'you@example.com');
 delete from qi_private.guesses  where user_id = (select id from auth.users where email = 'you@example.com');
 

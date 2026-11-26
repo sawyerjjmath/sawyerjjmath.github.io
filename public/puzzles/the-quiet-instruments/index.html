@@ -159,6 +159,48 @@
   ol.board .when { margin-left: auto; font-size: 0.84em; color: #7a7064; }
   ol.board li.me .n::after { content: " · you"; color: var(--seal); font-size: 0.86em; }
   .board-empty { color: #7a7064; font-style: italic; padding-left: 23px; }
+  .crown { display: inline-block; width: 15px; height: 12px; margin-left: 6px; vertical-align: -1px; color: #b3936e; }
+
+  /* the faint point where the title's curves run out */
+  .door {
+    position: absolute; z-index: 2; width: 26px; height: 26px; margin: -13px 0 0 -13px; padding: 0;
+    border: 0; border-radius: 50%; background: transparent; cursor: default;
+  }
+  .door::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px;
+    border-radius: 50%; background: #8c5f3a; opacity: 0.45; transition: opacity 0.4s, transform 0.4s;
+  }
+  .door:hover { border: 0; }
+  .door:hover::after { opacity: 0.9; transform: scale(1.6); }
+
+  /* instrument V */
+  .fifth { margin-top: 18px; border-color: #cdb79a; background: linear-gradient(180deg, #f8f4ed, #f3ede3); }
+  .fifth .range { margin-bottom: 4px; }
+  .vdone { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 7px 0; border-bottom: 1px solid var(--box-edge); font-size: 0.92em; color: var(--soft); }
+  .vdone b { color: var(--head); font-weight: normal; }
+  .vdone .ok { color: var(--seal); }
+  .vstage { padding-top: 12px; }
+  .vstage h3 { font-weight: normal; font-size: 1.15em; color: var(--head); margin: 0 0 8px; }
+  .vstage p { margin: 0 0 8px; max-width: 40em; }
+  .vstage .fmt { font-size: 0.86em; color: #7a7064; font-style: italic; }
+  .vstage .sealrow { max-width: 26em; margin-top: 10px; }
+  .vstage .verdict { min-height: 1.5em; }
+  .vfoot { display: flex; justify-content: flex-end; margin-top: 6px; }
+  .crowned-note { padding: 12px 0 2px; color: var(--strong); }
+  .crowned-note .crown { width: 20px; height: 16px; margin: 0 6px 0 0; vertical-align: -2px; }
+
+  /* the table: a chessboard of cards */
+  .table-wrap { margin: 4px 0 12px; }
+  .cboard { display: grid; grid-template-columns: 18px repeat(8, minmax(0, 1fr)); width: 100%; max-width: 386px; font-size: 0.78em; }
+  .cboard .lab { display: grid; place-items: center; color: #a3978a; font-size: 0.95em; }
+  .cboard .sq { aspect-ratio: 1; display: grid; place-items: center; background: #efe6d7; min-width: 0; }
+  .cboard .sq.dk { background: #ddcdb4; }
+  .card-pip {
+    display: grid; place-items: center; width: 72%; height: 84%; border-radius: 3px;
+    background: #fffdf9; border: 1px solid #cbbda8; box-shadow: 0 1px 0 rgba(90, 60, 30, 0.12);
+    line-height: 1; white-space: nowrap; color: var(--strong); font-variant-numeric: lining-nums;
+  }
+  .card-pip.red { color: #a24f37; }
 
   footer {
     margin-top: 56px; padding-top: 14px; border-top: 1px solid var(--rule);
@@ -194,6 +236,7 @@
 
   <div class="header">
     <canvas class="wm" id="wm" aria-hidden="true"></canvas>
+    <button class="door" id="door" type="button" tabindex="-1" aria-label="A faint point" hidden></button>
     <p class="kicker">Puzzle 2 · November 2026</p>
     <h1>The Quiet Instruments</h1>
   </div>
@@ -231,6 +274,7 @@
     <div id="play" hidden>
       <div class="rack" id="rack"></div>
       <div class="statement settled" id="settled" hidden aria-live="polite"></div>
+      <section class="inst fifth" id="fifth" hidden aria-label="Instrument V" aria-live="polite"></section>
     </div>
   </section>
 
@@ -387,7 +431,7 @@
       box.hidden = false;
       if (!box.dataset.built) {
         box.dataset.built = "1";
-        box.innerHTML = `<span class="label">Settled.</span> All four instruments are sealed.
+        box.innerHTML = `<span class="label">Settled.</span> Every instrument that spoke is sealed.
           <a href="${MAIL}">Write in</a> with the rule behind each one.
           <form class="row" id="name-form"><input id="name" maxlength="24" placeholder="name for the leaderboard" aria-label="Leaderboard name">
           <button class="primary" type="submit">Sign the board</button></form>
@@ -397,6 +441,113 @@
       $("name").value = state.display_name || $("name").value;
       if (state.display_name) $("name-msg").textContent = `Signed as “${state.display_name}”. You can change it.`;
     } else box.hidden = true;
+    $("door").hidden = !state.solved_at;
+  }
+
+  /* ---------- instrument V: found, not given ---------- */
+  const CROWN = `<svg class="crown" viewBox="0 0 30 24" aria-hidden="true"><path fill="currentColor" d="M2 7l7 6 6-11 6 11 7-6-3 14H5L2 7zm3 15h20v2H5z"/></svg>`;
+  const ROMAN = ["", "i", "ii", "iii", "iv", "v", "vi"];
+  let vstate = null, vconfirm = null;
+  const vKey = () => "quiet-instruments-2026-11:v:" + (user ? user.id : "");
+
+  $("door").addEventListener("click", () => { if (state && state.solved_at) openFifth(true); });
+
+  async function openFifth(scroll) {
+    const { data, error } = await sb.rpc("qi_v_state");
+    if (error || !data || !data.open) return;
+    vstate = data;
+    try { localStorage.setItem(vKey(), "1"); } catch (e) {}
+    $("fifth").hidden = false; renderFifth();
+    if (scroll) $("fifth").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function boardHTML(rows) {
+    let h = `<div class="cboard" role="img" aria-label="An eight by eight table of cards">`;
+    rows.forEach((row, ri) => {
+      h += `<div class="lab">${8 - ri}</div>`;
+      row.forEach((c, fi) => {
+        const dark = (ri + fi) % 2 === 1, red = /[♥♦]/.test(c);
+        h += `<div class="sq${dark ? " dk" : ""}">${c ? `<span class="card-pip${red ? " red" : ""}">${esc(c)}</span>` : ""}</div>`;
+      });
+    });
+    h += `<div></div>` + "abcdefgh".split("").map((f) => `<div class="lab">${f}</div>`).join("") + `</div>`;
+    return h;
+  }
+
+  function renderFifth() {
+    const box = $("fifth"), st = vstate.stages || [], crowned = !!vstate.crowned_at;
+    const cur = st.find((s) => !s.sealed);
+    box.classList.toggle("sealed", crowned);
+    box.classList.toggle("live", !crowned && !!cur && cur.remaining > 0);
+    box.classList.toggle("spent", !!cur && cur.remaining <= 0);
+    let h = `<div class="inst-head"><span class="name">V</span><span class="lamp" aria-hidden="true"></span></div>
+      <div class="range">speaks only to those who have settled</div>`;
+    st.filter((s) => s.sealed).forEach((s) => {
+      h += `<div class="vdone"><span>${ROMAN[s.stage]} · <b>${esc(s.title)}</b></span><span class="ok">sealed · ${esc(s.sealed)}</span></div>`;
+    });
+    if (crowned) {
+      h += `<div class="crowned-note">${CROWN}<b>Crowned.</b> ` + (state.display_name
+        ? `The crown now sits beside “${esc(state.display_name)}” on the board.`
+        : `Sign the board above and the crown will sit beside your name.`) + `</div>`;
+    } else if (cur) {
+      const b = cur.body || {};
+      h += `<div class="vstage"><h3>${ROMAN[cur.stage]} · ${esc(cur.title)}</h3>`;
+      if (b.board) h += `<div class="table-wrap">${boardHTML(b.board)}</div>`;
+      (b.lines || []).forEach((l) => (h += `<p>${esc(l)}</p>`));
+      if (b.format) h += `<p class="fmt">${esc(b.format)}</p>`;
+      h += `<div class="asked"><span></span><span class="pips" aria-label="seals left">` +
+        Array.from({ length: cur.max }, (_, j) => `<span class="pip ${j < cur.remaining ? "full" : ""}"></span>`).join("") +
+        ` <span>${cur.remaining} of ${cur.max}</span></span></div>`;
+      if (cur.remaining > 0) {
+        h += `<form class="row sealrow" id="vseal"><input id="vguess" autocomplete="off" spellcheck="false" placeholder="answer" aria-label="Answer for ${esc(cur.title)}">
+          <button type="submit" class="primary" id="vbtn">Seal</button></form>`;
+      }
+      h += `<div class="verdict" id="vverdict"></div></div>`;
+    }
+    box.innerHTML = h;
+    if (cur && !crowned && cur.remaining <= 0) vverdict("no", `Every seal is spent. The crown is out of reach, but your reasoning is not: <a href="${MAIL}">write in anyway</a>.`);
+    const form = $("vseal");
+    if (form) {
+      form.addEventListener("submit", (e) => sealFifth(e, cur));
+      $("vguess").addEventListener("input", () => { if (vconfirm != null) { vconfirm = null; $("vbtn").textContent = "Seal"; vverdict("", ""); } });
+    }
+  }
+  function vverdict(cls, html) { const v = $("vverdict"); if (v) { v.className = "verdict " + cls; v.innerHTML = html; } }
+
+  function vWellFormed(kind, g) {
+    g = g.replace(/[\s,_]/g, "").replace("−", "-").toLowerCase();
+    if (kind === "move") return (g.match(/[a-h][1-8]/g) || []).length === 2;
+    if (kind === "fraction") return /^[+-]?\d{1,12}(\/\d{1,12})?$/.test(g) && !/\/0+$/.test(g);
+    if (kind === "integer") return /^\d{1,15}$/.test(g);
+    return false;
+  }
+  const V_FORM = { move: "Two squares, from and to: a1h8.", fraction: "An exact fraction, like p/q.", integer: "A whole number." };
+
+  async function sealFifth(e, cur) {
+    e.preventDefault();
+    const inp = $("vguess"), btn = $("vbtn"), g = inp.value.trim();
+    if (!g) { inp.focus(); return; }
+    if (!vWellFormed(cur.kind, g)) { vverdict("no", "The instrument does not read that form. " + V_FORM[cur.kind]); return; }
+    if (cur.remaining === 1 && vconfirm !== g) {
+      vconfirm = g; btn.textContent = "Seal for good";
+      vverdict("", `This is the last seal. Press again to seal “${esc(g)}”.`);
+      return;
+    }
+    vconfirm = null; btn.disabled = true; vverdict("", "Weighing …");
+    const { data, error } = await sb.rpc("qi_v_seal", { p_guess: g });
+    if (error || !data) { btn.disabled = false; vverdict("no", "Couldn’t reach the room. Try again."); return; }
+    if (data.open === false) { $("fifth").hidden = true; return; }
+    vstate = data;
+    if (data.result === "malformed") { renderFifth(); vverdict("no", "The instrument does not read that form. " + V_FORM[cur.kind]); return; }
+    renderFifth();
+    if (data.result === "wrong") {
+      const now = (data.stages || []).find((s) => s.stage === cur.stage);
+      if (now && now.remaining > 0) {
+        vverdict("no", `The seal does not take. ${now.remaining} ${now.remaining === 1 ? "seal remains" : "seals remain"}.`);
+        const r = $("fifth"); r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake");
+      }
+    }
+    if (data.result === "crowned") loadBoard();
   }
 
   async function setName(e) {
@@ -407,6 +558,7 @@
     if (error) { m.className = "msg no"; m.textContent = error.message || "Couldn’t sign the board."; return; }
     state = data; m.className = "msg ok"; m.textContent = `Signed as “${data.display_name}”.`;
     loadBoard();
+    if (vstate && !$("fifth").hidden) renderFifth();
   }
 
   /* ---------- leaderboard (public) ---------- */
@@ -416,7 +568,8 @@
     const ol = $("board"), myName = state && state.display_name;
     ol.innerHTML = data.board.map((r) => {
       const when = new Date(r.solved_at).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-      return `<li class="${myName && r.name === myName ? "me" : ""}"><span class="n">${esc(r.name)}</span><span class="when">${esc(when)}</span></li>`;
+      const crown = r.crowned ? CROWN.replace('aria-hidden="true"', 'role="img" aria-label="crowned"><title>Crowned</title') : "";
+      return `<li class="${myName && r.name === myName ? "me" : ""}"><span class="n">${esc(r.name)}${crown}</span><span class="when">${esc(when)}</span></li>`;
     }).join("");
     $("board-empty").hidden = data.board.length > 0;
     $("board-count").textContent = data.solvers ? `${data.solvers} ${data.solvers === 1 ? "solver" : "solvers"}` : "";
@@ -460,6 +613,9 @@
     $("who").innerHTML = `${esc(user.email || "")} · <button class="linkish" id="signout" type="button">leave</button>`;
     $("signout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
     render(); loadBoard();
+    let found = false;
+    try { found = localStorage.getItem(vKey()) === "1"; } catch (e) {}
+    if (state.solved_at && found) openFifth(false);
   }
 
   /* ---------- start ---------- */
@@ -516,6 +672,11 @@
       p = q; t += dt; steps++;
       if (steps % 25 === 0) p = resample(p, Math.max(24, Math.min(200, Math.round(len(p) / 0.015))));
     }
+    // the round point every curve shrinks to
+    let mx = 0, my = 0; p.forEach(([x, y]) => { mx += x; my += y; }); mx /= p.length; my /= p.length;
+    const door = document.getElementById('door');
+    door.style.left = (cv.offsetLeft + cx + mx * sc * 1.2) + 'px';
+    door.style.top = (cv.offsetTop + cy - my * sc) + 'px';
   }
   new ResizeObserver(draw).observe(cv.parentNode);
 })();

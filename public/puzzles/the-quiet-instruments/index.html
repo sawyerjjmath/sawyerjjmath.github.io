@@ -159,6 +159,59 @@
   ol.board .when { margin-left: auto; font-size: 0.84em; color: #7a7064; }
   ol.board li.me .n::after { content: " · you"; color: var(--seal); font-size: 0.86em; }
   .board-empty { color: #7a7064; font-style: italic; padding-left: 23px; }
+  .crown { display: inline-block; width: 15px; height: 12px; margin-left: 6px; vertical-align: -1px; color: #b3936e; }
+
+  /* the first instrument's whisper, once everything is sealed */
+  .inst { position: relative; }
+  .psst {
+    position: absolute; right: 12px; top: -14px; z-index: 3; max-width: 250px;
+    padding: 7px 11px; font-size: 0.86em; line-height: 1.45; color: var(--strong);
+    background: #fffdf9; border: 1px solid #cdb79a; border-radius: 4px;
+    box-shadow: 0 6px 18px -8px rgba(91, 61, 35, 0.35);
+    transform-origin: 90% 100%; animation: psst 0.5s cubic-bezier(.2, 1.4, .4, 1) 0.6s both;
+  }
+  .psst::after {
+    content: ""; position: absolute; right: 22px; bottom: -6px; width: 10px; height: 10px;
+    background: #fffdf9; border-right: 1px solid #cdb79a; border-bottom: 1px solid #cdb79a; transform: rotate(45deg);
+  }
+  .psst b { font-style: italic; color: var(--head); }
+  .psst q { quotes: "“" "”"; color: var(--head); }
+  @keyframes psst { from { opacity: 0; transform: scale(0.6) translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .psst { animation: none; } }
+
+  /* instrument V */
+  .fifth { margin-top: 18px; border-color: #cdb79a; background: linear-gradient(180deg, #f8f4ed, #f3ede3); }
+  .fifth .range { margin-bottom: 4px; }
+  .vdone { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 7px 0; border-bottom: 1px solid var(--box-edge); font-size: 0.92em; color: var(--soft); }
+  .vdone b { color: var(--head); font-weight: normal; }
+  .vdone .ok { color: var(--seal); }
+  .vstage { padding-top: 12px; }
+  .vstage h3 { font-weight: normal; font-size: 1.15em; color: var(--head); margin: 0 0 8px; }
+  .vstage p { margin: 0 0 8px; max-width: 40em; }
+  .vstage .fmt { font-size: 0.86em; color: #7a7064; font-style: italic; }
+  .testimony { margin: 4px 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+  .testimony .who { font-weight: bold; color: var(--strong); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .testimony ol { margin: 0; padding-left: 1.3em; color: #3b362f; }
+  .testimony li { margin: 0 0 2px; padding-left: 2px; }
+  .testimony li::marker { color: #a3978a; font-size: 0.86em; }
+  .vstage .sealrow { max-width: 26em; margin-top: 10px; }
+  .vstage .verdict { min-height: 1.5em; }
+  .vfoot { display: flex; justify-content: flex-end; margin-top: 6px; }
+  .crowned-note { padding: 12px 0 2px; color: var(--strong); }
+  .crowned-note .crown { width: 20px; height: 16px; margin: 0 6px 0 0; vertical-align: -2px; }
+
+  /* the table: a chessboard of cards */
+  .table-wrap { margin: 4px 0 12px; }
+  .cboard { display: grid; grid-template-columns: 18px repeat(8, minmax(0, 1fr)); width: 100%; max-width: 386px; font-size: 0.78em; }
+  .cboard .lab { display: grid; place-items: center; color: #a3978a; font-size: 0.95em; }
+  .cboard .sq { aspect-ratio: 1; display: grid; place-items: center; background: #efe6d7; min-width: 0; }
+  .cboard .sq.dk { background: #ddcdb4; }
+  .card-pip {
+    display: grid; place-items: center; width: 72%; height: 84%; border-radius: 3px;
+    background: #fffdf9; border: 1px solid #cbbda8; box-shadow: 0 1px 0 rgba(90, 60, 30, 0.12);
+    line-height: 1; white-space: nowrap; color: var(--strong); font-variant-numeric: lining-nums;
+  }
+  .card-pip.red { color: #a24f37; }
 
   footer {
     margin-top: 56px; padding-top: 14px; border-top: 1px solid var(--rule);
@@ -174,6 +227,7 @@
     h1 { font-size: 2em; }
     .header canvas.wm { width: 70%; opacity: 0.7; }
     .rack { grid-template-columns: 1fr; }
+    .testimony { grid-template-columns: 1fr; }
     .statement { padding: 14px 16px 12px; }
   }
   @media (prefers-reduced-motion: reduce) { .shake { animation: none; } }
@@ -231,6 +285,7 @@
     <div id="play" hidden>
       <div class="rack" id="rack"></div>
       <div class="statement settled" id="settled" hidden aria-live="polite"></div>
+      <section class="inst fifth" id="fifth" hidden aria-label="Instrument V" aria-live="polite"></section>
     </div>
   </section>
 
@@ -314,6 +369,7 @@
       e.preventDefault();
       const ins = [...els[k].ask.querySelectorAll("input")];
       const raw = ins.map((i) => i.value.trim().replace("−", "-"));
+      if (k === "III" && raw.some(isUnlockWord)) { ins.forEach((i) => (i.value = "")); unlockBonus(); return; }
       const blank = raw.findIndex((v) => v === "");
       if (blank >= 0) { ins[blank].focus(); return; }
       const nums = raw.map(Number);
@@ -322,6 +378,9 @@
       if (logs[k].length > 400) logs[k].shift();
       saveLogs(); renderLog(k);
       ins.forEach((i) => (i.value = "")); ins[0].focus();
+    });
+    if (k === "III") els[k].ask.addEventListener("input", (e) => {
+      if (isUnlockWord(e.target.value)) { e.target.value = ""; unlockBonus(); }
     });
 
     els[k].seal.addEventListener("submit", async (e) => {
@@ -397,6 +456,144 @@
       $("name").value = state.display_name || $("name").value;
       if (state.display_name) $("name-msg").textContent = `Signed as “${state.display_name}”. You can change it.`;
     } else box.hidden = true;
+
+    // once settled: the first instrument whispers, and the third will take a word
+    const iii = els.III.ask.querySelector("input");
+    iii.setAttribute("inputmode", state.solved_at ? "text" : "numeric");
+    showPsst(!!state.solved_at && !isUnlocked());
+    if (state.solved_at && !vstate && !vopening) openFifth(false);
+  }
+
+  /* ---------- the bonus puzzle: instrument V ---------- */
+  const CROWN = `<svg class="crown" viewBox="0 0 30 24" aria-hidden="true"><path fill="currentColor" d="M2 7l7 6 6-11 6 11 7-6-3 14H5L2 7zm3 15h20v2H5z"/></svg>`;
+  const ROMAN = ["", "i", "ii", "iii", "iv", "v", "vi"];
+  let vstate = null, vconfirm = null, vopening = false;
+  const isUnlockWord = (v) => String(v).trim().toLowerCase() === "unlock";
+  const unlockKey = () => "quiet-instruments-2026-11:unlocked:" + (user ? user.id : "");
+  function isUnlocked() { try { return localStorage.getItem(unlockKey()) === "1"; } catch (e) { return false; } }
+
+  function showPsst(on) {
+    let p = els.I.root.querySelector(".psst");
+    if (!on) { if (p) p.remove(); return; }
+    if (p) return;
+    p = document.createElement("div");
+    p.className = "psst"; p.setAttribute("role", "status");
+    p.innerHTML = `<b>psst.</b> Type <q>unlock</q> into the third instrument to open a bonus puzzle.`;
+    els.I.root.appendChild(p);
+  }
+
+  async function unlockBonus() {
+    if (!state || !state.solved_at) return;
+    try { localStorage.setItem(unlockKey(), "1"); } catch (e) {}
+    showPsst(false);
+    verdict("III", "ok", "Sealed · " + esc(state.sealed.III) + " · something clicks open below.");
+    await openFifth(true);
+    $("fifth").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // V shows once unlocked here, or whenever the server already has bonus progress for this player
+  async function openFifth(force) {
+    vopening = true;
+    const { data, error } = await sb.rpc("qi_v_state");
+    vopening = false;
+    if (error || !data || !data.open || !(data.stages || []).length) return;
+    const begun = !!data.crowned_at || data.stages.some((s) => s.sealed || s.remaining < s.max);
+    if (!force && !begun && !isUnlocked()) return;
+    if (begun) { try { localStorage.setItem(unlockKey(), "1"); } catch (e) {} showPsst(false); }
+    vstate = data;
+    $("fifth").hidden = false; renderFifth();
+  }
+
+  function boardHTML(rows) {
+    let h = `<div class="cboard" role="img" aria-label="An eight by eight table of cards">`;
+    rows.forEach((row, ri) => {
+      h += `<div class="lab">${8 - ri}</div>`;
+      row.forEach((c, fi) => {
+        const dark = (ri + fi) % 2 === 1, red = /[♥♦]/.test(c);
+        h += `<div class="sq${dark ? " dk" : ""}">${c ? `<span class="card-pip${red ? " red" : ""}">${esc(c)}</span>` : ""}</div>`;
+      });
+    });
+    h += `<div></div>` + "abcdefgh".split("").map((f) => `<div class="lab">${f}</div>`).join("") + `</div>`;
+    return h;
+  }
+
+  function renderFifth() {
+    const box = $("fifth"), st = vstate.stages || [], crowned = !!vstate.crowned_at;
+    const cur = st.find((s) => !s.sealed);
+    box.classList.toggle("sealed", crowned);
+    box.classList.toggle("live", !crowned && !!cur && cur.remaining > 0);
+    box.classList.toggle("spent", !!cur && cur.remaining <= 0);
+    let h = `<div class="inst-head"><span class="name">V</span><span class="lamp" aria-hidden="true"></span></div>
+      <div class="range">a bonus puzzle, for those who have settled</div>`;
+    st.filter((s) => s.sealed).forEach((s) => {
+      h += `<div class="vdone"><span>${ROMAN[s.stage]} · <b>${esc(s.title)}</b></span><span class="ok">sealed · ${esc(s.sealed)}</span></div>`;
+    });
+    if (crowned) {
+      h += `<div class="crowned-note">${CROWN}<b>Crowned.</b> ` + (state.display_name
+        ? `The crown now sits beside “${esc(state.display_name)}” on the board.`
+        : `Sign the board above and the crown will sit beside your name.`) + `</div>`;
+    } else if (cur) {
+      const b = cur.body || {};
+      h += `<div class="vstage"><h3>${ROMAN[cur.stage]} · ${esc(cur.title)}</h3>`;
+      if (b.board) h += `<div class="table-wrap">${boardHTML(b.board)}</div>`;
+      (b.lines || []).forEach((l) => (h += `<p>${esc(l)}</p>`));
+      if (b.testimony) h += `<div class="testimony">` + b.testimony.map((t) =>
+        `<div><div class="who">${esc(t.who)}</div><ol>${t.says.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></div>`).join("") + `</div>`;
+      if (b.format) h += `<p class="fmt">${esc(b.format)}</p>`;
+      h += `<div class="asked"><span></span><span class="pips" aria-label="seals left">` +
+        Array.from({ length: cur.max }, (_, j) => `<span class="pip ${j < cur.remaining ? "full" : ""}"></span>`).join("") +
+        ` <span>${cur.remaining} of ${cur.max}</span></span></div>`;
+      if (cur.remaining > 0) {
+        h += `<form class="row sealrow" id="vseal"><input id="vguess" autocomplete="off" spellcheck="false" placeholder="answer" aria-label="Answer for ${esc(cur.title)}">
+          <button type="submit" class="primary" id="vbtn">Seal</button></form>`;
+      }
+      h += `<div class="verdict" id="vverdict"></div></div>`;
+    }
+    box.innerHTML = h;
+    if (cur && !crowned && cur.remaining <= 0) vverdict("no", `Every seal is spent. The crown is out of reach, but your reasoning is not: <a href="${MAIL}">write in anyway</a>.`);
+    const form = $("vseal");
+    if (form) {
+      form.addEventListener("submit", (e) => sealFifth(e, cur));
+      $("vguess").addEventListener("input", () => { if (vconfirm != null) { vconfirm = null; $("vbtn").textContent = "Seal"; vverdict("", ""); } });
+    }
+  }
+  function vverdict(cls, html) { const v = $("vverdict"); if (v) { v.className = "verdict " + cls; v.innerHTML = html; } }
+
+  function vWellFormed(kind, g) {
+    g = g.replace(/[\s,_]/g, "").replace("−", "-").toLowerCase();
+    if (kind === "code") return /^\d{1,12}$/.test(g.replace(/[-.·]/g, ""));
+    if (kind === "move") return (g.match(/[a-h][1-8]/g) || []).length === 2;
+    if (kind === "fraction") return /^[+-]?\d{1,12}(\/\d{1,12})?$/.test(g) && !/\/0+$/.test(g);
+    if (kind === "integer") return /^\d{1,15}$/.test(g);
+    return false;
+  }
+  const V_FORM = { code: "A row of digits, one per dial.", move: "Two squares, from and to: a1h8.", fraction: "An exact fraction, like p/q.", integer: "A whole number." };
+
+  async function sealFifth(e, cur) {
+    e.preventDefault();
+    const inp = $("vguess"), btn = $("vbtn"), g = inp.value.trim();
+    if (!g) { inp.focus(); return; }
+    if (!vWellFormed(cur.kind, g)) { vverdict("no", "The instrument does not read that form. " + V_FORM[cur.kind]); return; }
+    if (cur.remaining === 1 && vconfirm !== g) {
+      vconfirm = g; btn.textContent = "Seal for good";
+      vverdict("", `This is the last seal. Press again to seal “${esc(g)}”.`);
+      return;
+    }
+    vconfirm = null; btn.disabled = true; vverdict("", "Weighing …");
+    const { data, error } = await sb.rpc("qi_v_seal", { p_guess: g });
+    if (error || !data) { btn.disabled = false; vverdict("no", "Couldn’t reach the room. Try again."); return; }
+    if (data.open === false) { $("fifth").hidden = true; return; }
+    vstate = data;
+    if (data.result === "malformed") { renderFifth(); vverdict("no", "The instrument does not read that form. " + V_FORM[cur.kind]); return; }
+    renderFifth();
+    if (data.result === "wrong") {
+      const now = (data.stages || []).find((s) => s.stage === cur.stage);
+      if (now && now.remaining > 0) {
+        vverdict("no", `The seal does not take. ${now.remaining} ${now.remaining === 1 ? "seal remains" : "seals remain"}.`);
+        const r = $("fifth"); r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake");
+      }
+    }
+    if (data.result === "crowned") loadBoard();
   }
 
   async function setName(e) {
@@ -407,6 +604,7 @@
     if (error) { m.className = "msg no"; m.textContent = error.message || "Couldn’t sign the board."; return; }
     state = data; m.className = "msg ok"; m.textContent = `Signed as “${data.display_name}”.`;
     loadBoard();
+    if (vstate && !$("fifth").hidden) renderFifth();
   }
 
   /* ---------- leaderboard (public) ---------- */
@@ -416,7 +614,8 @@
     const ol = $("board"), myName = state && state.display_name;
     ol.innerHTML = data.board.map((r) => {
       const when = new Date(r.solved_at).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-      return `<li class="${myName && r.name === myName ? "me" : ""}"><span class="n">${esc(r.name)}</span><span class="when">${esc(when)}</span></li>`;
+      const crown = r.crowned ? CROWN.replace('aria-hidden="true"', 'role="img" aria-label="crowned"><title>Crowned</title') : "";
+      return `<li class="${myName && r.name === myName ? "me" : ""}"><span class="n">${esc(r.name)}${crown}</span><span class="when">${esc(when)}</span></li>`;
     }).join("");
     $("board-empty").hidden = data.board.length > 0;
     $("board-count").textContent = data.solvers ? `${data.solvers} ${data.solvers === 1 ? "solver" : "solvers"}` : "";

@@ -161,6 +161,24 @@
   .board-empty { color: #7a7064; font-style: italic; padding-left: 23px; }
   .crown { display: inline-block; width: 15px; height: 12px; margin-left: 6px; vertical-align: -1px; color: #b3936e; }
 
+  /* the first instrument's whisper, once everything is sealed */
+  .inst { position: relative; }
+  .psst {
+    position: absolute; right: 12px; top: -14px; z-index: 3; max-width: 250px;
+    padding: 7px 11px; font-size: 0.86em; line-height: 1.45; color: var(--strong);
+    background: #fffdf9; border: 1px solid #cdb79a; border-radius: 4px;
+    box-shadow: 0 6px 18px -8px rgba(91, 61, 35, 0.35);
+    transform-origin: 90% 100%; animation: psst 0.5s cubic-bezier(.2, 1.4, .4, 1) 0.6s both;
+  }
+  .psst::after {
+    content: ""; position: absolute; right: 22px; bottom: -6px; width: 10px; height: 10px;
+    background: #fffdf9; border-right: 1px solid #cdb79a; border-bottom: 1px solid #cdb79a; transform: rotate(45deg);
+  }
+  .psst b { font-style: italic; color: var(--head); }
+  .psst q { quotes: "“" "”"; color: var(--head); }
+  @keyframes psst { from { opacity: 0; transform: scale(0.6) translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .psst { animation: none; } }
+
   /* instrument V */
   .fifth { margin-top: 18px; border-color: #cdb79a; background: linear-gradient(180deg, #f8f4ed, #f3ede3); }
   .fifth .range { margin-bottom: 4px; }
@@ -351,6 +369,7 @@
       e.preventDefault();
       const ins = [...els[k].ask.querySelectorAll("input")];
       const raw = ins.map((i) => i.value.trim().replace("−", "-"));
+      if (k === "III" && raw.some(isUnlockWord)) { ins.forEach((i) => (i.value = "")); unlockBonus(); return; }
       const blank = raw.findIndex((v) => v === "");
       if (blank >= 0) { ins[blank].focus(); return; }
       const nums = raw.map(Number);
@@ -359,6 +378,9 @@
       if (logs[k].length > 400) logs[k].shift();
       saveLogs(); renderLog(k);
       ins.forEach((i) => (i.value = "")); ins[0].focus();
+    });
+    if (k === "III") els[k].ask.addEventListener("input", (e) => {
+      if (isUnlockWord(e.target.value)) { e.target.value = ""; unlockBonus(); }
     });
 
     els[k].seal.addEventListener("submit", async (e) => {
@@ -434,19 +456,50 @@
       $("name").value = state.display_name || $("name").value;
       if (state.display_name) $("name-msg").textContent = `Signed as “${state.display_name}”. You can change it.`;
     } else box.hidden = true;
-    if (state.solved_at && !vstate && !vopening) openFifth();
+
+    // once settled: the first instrument whispers, and the third will take a word
+    const iii = els.III.ask.querySelector("input");
+    iii.setAttribute("inputmode", state.solved_at ? "text" : "numeric");
+    showPsst(!!state.solved_at && !isUnlocked());
+    if (state.solved_at && !vstate && !vopening) openFifth(false);
   }
 
-  /* ---------- instrument V: opens to those who settle, unlocks for those who reason ---------- */
+  /* ---------- the bonus puzzle: instrument V ---------- */
   const CROWN = `<svg class="crown" viewBox="0 0 30 24" aria-hidden="true"><path fill="currentColor" d="M2 7l7 6 6-11 6 11 7-6-3 14H5L2 7zm3 15h20v2H5z"/></svg>`;
   const ROMAN = ["", "i", "ii", "iii", "iv", "v", "vi"];
   let vstate = null, vconfirm = null, vopening = false;
+  const isUnlockWord = (v) => String(v).trim().toLowerCase() === "unlock";
+  const unlockKey = () => "quiet-instruments-2026-11:unlocked:" + (user ? user.id : "");
+  function isUnlocked() { try { return localStorage.getItem(unlockKey()) === "1"; } catch (e) { return false; } }
 
-  async function openFifth() {
+  function showPsst(on) {
+    let p = els.I.root.querySelector(".psst");
+    if (!on) { if (p) p.remove(); return; }
+    if (p) return;
+    p = document.createElement("div");
+    p.className = "psst"; p.setAttribute("role", "status");
+    p.innerHTML = `<b>psst.</b> Type <q>unlock</q> into the third instrument to open a bonus puzzle.`;
+    els.I.root.appendChild(p);
+  }
+
+  async function unlockBonus() {
+    if (!state || !state.solved_at) return;
+    try { localStorage.setItem(unlockKey(), "1"); } catch (e) {}
+    showPsst(false);
+    verdict("III", "ok", "Sealed · " + esc(state.sealed.III) + " · something clicks open below.");
+    await openFifth(true);
+    $("fifth").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // V shows once unlocked here, or whenever the server already has bonus progress for this player
+  async function openFifth(force) {
     vopening = true;
     const { data, error } = await sb.rpc("qi_v_state");
     vopening = false;
     if (error || !data || !data.open || !(data.stages || []).length) return;
+    const begun = !!data.crowned_at || data.stages.some((s) => s.sealed || s.remaining < s.max);
+    if (!force && !begun && !isUnlocked()) return;
+    if (begun) { try { localStorage.setItem(unlockKey(), "1"); } catch (e) {} showPsst(false); }
     vstate = data;
     $("fifth").hidden = false; renderFifth();
   }
@@ -470,9 +523,8 @@
     box.classList.toggle("sealed", crowned);
     box.classList.toggle("live", !crowned && !!cur && cur.remaining > 0);
     box.classList.toggle("spent", !!cur && cur.remaining <= 0);
-    const unlocked = st.length && st[0].sealed;
     let h = `<div class="inst-head"><span class="name">V</span><span class="lamp" aria-hidden="true"></span></div>
-      <div class="range">${unlocked ? "speaks only to those who have settled" : "locked"}</div>`;
+      <div class="range">a bonus puzzle, for those who have settled</div>`;
     st.filter((s) => s.sealed).forEach((s) => {
       h += `<div class="vdone"><span>${ROMAN[s.stage]} · <b>${esc(s.title)}</b></span><span class="ok">sealed · ${esc(s.sealed)}</span></div>`;
     });

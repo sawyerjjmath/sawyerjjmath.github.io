@@ -46,10 +46,13 @@ create table if not exists qi_private.v_stages (
   stage     int  primary key check (stage > 0),
   title     text not null,
   body      jsonb not null,                                   -- what the page shows
-  kind      text not null check (kind in ('move', 'fraction', 'integer')),
+  kind      text not null,
   answer    text not null,
   max_seals int  not null check (max_seals > 0)
 );
+alter table qi_private.v_stages drop constraint if exists v_stages_kind_check;
+alter table qi_private.v_stages add constraint v_stages_kind_check
+  check (kind in ('code', 'move', 'fraction', 'integer'));
 
 alter table qi_private.progress add column if not exists v_sealed   jsonb not null default '{}'::jsonb;
 alter table qi_private.progress add column if not exists v_used     jsonb not null default '{}'::jsonb;
@@ -212,7 +215,12 @@ declare
 begin
   if p_guess is null or char_length(p_guess) > 60 then return null; end if;
   g := lower(replace(regexp_replace(p_guess, '[\s,_]', '', 'g'), '−', '-'));
-  if p_kind = 'move' then
+  if p_kind = 'code' then
+    -- a row of digits, leading zeros kept; dashes, dots and middots between them are ignored
+    g := regexp_replace(g, '[-.·]', '', 'g');
+    if g !~ '^[0-9]{1,12}$' then return null; end if;
+    return g;
+  elsif p_kind = 'move' then
     select array_agg(x[1]) into sq from regexp_matches(g, '([a-h][1-8])', 'g') as x;
     if sq is null or array_length(sq, 1) <> 2 then return null; end if;
     return sq[1] || sq[2];

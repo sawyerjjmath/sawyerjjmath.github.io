@@ -161,18 +161,6 @@
   .board-empty { color: #7a7064; font-style: italic; padding-left: 23px; }
   .crown { display: inline-block; width: 15px; height: 12px; margin-left: 6px; vertical-align: -1px; color: #b3936e; }
 
-  /* the faint point where the title's curves run out */
-  .door {
-    position: absolute; z-index: 2; width: 26px; height: 26px; margin: -13px 0 0 -13px; padding: 0;
-    border: 0; border-radius: 50%; background: transparent; cursor: default;
-  }
-  .door::after {
-    content: ""; position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px;
-    border-radius: 50%; background: #8c5f3a; opacity: 0.45; transition: opacity 0.4s, transform 0.4s;
-  }
-  .door:hover { border: 0; }
-  .door:hover::after { opacity: 0.9; transform: scale(1.6); }
-
   /* instrument V */
   .fifth { margin-top: 18px; border-color: #cdb79a; background: linear-gradient(180deg, #f8f4ed, #f3ede3); }
   .fifth .range { margin-bottom: 4px; }
@@ -183,6 +171,11 @@
   .vstage h3 { font-weight: normal; font-size: 1.15em; color: var(--head); margin: 0 0 8px; }
   .vstage p { margin: 0 0 8px; max-width: 40em; }
   .vstage .fmt { font-size: 0.86em; color: #7a7064; font-style: italic; }
+  .testimony { margin: 4px 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+  .testimony .who { font-weight: bold; color: var(--strong); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .testimony ol { margin: 0; padding-left: 1.3em; color: #3b362f; }
+  .testimony li { margin: 0 0 2px; padding-left: 2px; }
+  .testimony li::marker { color: #a3978a; font-size: 0.86em; }
   .vstage .sealrow { max-width: 26em; margin-top: 10px; }
   .vstage .verdict { min-height: 1.5em; }
   .vfoot { display: flex; justify-content: flex-end; margin-top: 6px; }
@@ -216,6 +209,7 @@
     h1 { font-size: 2em; }
     .header canvas.wm { width: 70%; opacity: 0.7; }
     .rack { grid-template-columns: 1fr; }
+    .testimony { grid-template-columns: 1fr; }
     .statement { padding: 14px 16px 12px; }
   }
   @media (prefers-reduced-motion: reduce) { .shake { animation: none; } }
@@ -236,7 +230,6 @@
 
   <div class="header">
     <canvas class="wm" id="wm" aria-hidden="true"></canvas>
-    <button class="door" id="door" type="button" tabindex="-1" aria-label="A faint point" hidden></button>
     <p class="kicker">Puzzle 2 · November 2026</p>
     <h1>The Quiet Instruments</h1>
   </div>
@@ -431,7 +424,7 @@
       box.hidden = false;
       if (!box.dataset.built) {
         box.dataset.built = "1";
-        box.innerHTML = `<span class="label">Settled.</span> Every instrument that spoke is sealed.
+        box.innerHTML = `<span class="label">Settled.</span> All four instruments are sealed.
           <a href="${MAIL}">Write in</a> with the rule behind each one.
           <form class="row" id="name-form"><input id="name" maxlength="24" placeholder="name for the leaderboard" aria-label="Leaderboard name">
           <button class="primary" type="submit">Sign the board</button></form>
@@ -441,24 +434,21 @@
       $("name").value = state.display_name || $("name").value;
       if (state.display_name) $("name-msg").textContent = `Signed as “${state.display_name}”. You can change it.`;
     } else box.hidden = true;
-    $("door").hidden = !state.solved_at;
+    if (state.solved_at && !vstate && !vopening) openFifth();
   }
 
-  /* ---------- instrument V: found, not given ---------- */
+  /* ---------- instrument V: opens to those who settle, unlocks for those who reason ---------- */
   const CROWN = `<svg class="crown" viewBox="0 0 30 24" aria-hidden="true"><path fill="currentColor" d="M2 7l7 6 6-11 6 11 7-6-3 14H5L2 7zm3 15h20v2H5z"/></svg>`;
   const ROMAN = ["", "i", "ii", "iii", "iv", "v", "vi"];
-  let vstate = null, vconfirm = null;
-  const vKey = () => "quiet-instruments-2026-11:v:" + (user ? user.id : "");
+  let vstate = null, vconfirm = null, vopening = false;
 
-  $("door").addEventListener("click", () => { if (state && state.solved_at) openFifth(true); });
-
-  async function openFifth(scroll) {
+  async function openFifth() {
+    vopening = true;
     const { data, error } = await sb.rpc("qi_v_state");
-    if (error || !data || !data.open) return;
+    vopening = false;
+    if (error || !data || !data.open || !(data.stages || []).length) return;
     vstate = data;
-    try { localStorage.setItem(vKey(), "1"); } catch (e) {}
     $("fifth").hidden = false; renderFifth();
-    if (scroll) $("fifth").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function boardHTML(rows) {
@@ -480,8 +470,9 @@
     box.classList.toggle("sealed", crowned);
     box.classList.toggle("live", !crowned && !!cur && cur.remaining > 0);
     box.classList.toggle("spent", !!cur && cur.remaining <= 0);
+    const unlocked = st.length && st[0].sealed;
     let h = `<div class="inst-head"><span class="name">V</span><span class="lamp" aria-hidden="true"></span></div>
-      <div class="range">speaks only to those who have settled</div>`;
+      <div class="range">${unlocked ? "speaks only to those who have settled" : "locked"}</div>`;
     st.filter((s) => s.sealed).forEach((s) => {
       h += `<div class="vdone"><span>${ROMAN[s.stage]} · <b>${esc(s.title)}</b></span><span class="ok">sealed · ${esc(s.sealed)}</span></div>`;
     });
@@ -494,6 +485,8 @@
       h += `<div class="vstage"><h3>${ROMAN[cur.stage]} · ${esc(cur.title)}</h3>`;
       if (b.board) h += `<div class="table-wrap">${boardHTML(b.board)}</div>`;
       (b.lines || []).forEach((l) => (h += `<p>${esc(l)}</p>`));
+      if (b.testimony) h += `<div class="testimony">` + b.testimony.map((t) =>
+        `<div><div class="who">${esc(t.who)}</div><ol>${t.says.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></div>`).join("") + `</div>`;
       if (b.format) h += `<p class="fmt">${esc(b.format)}</p>`;
       h += `<div class="asked"><span></span><span class="pips" aria-label="seals left">` +
         Array.from({ length: cur.max }, (_, j) => `<span class="pip ${j < cur.remaining ? "full" : ""}"></span>`).join("") +
@@ -516,12 +509,13 @@
 
   function vWellFormed(kind, g) {
     g = g.replace(/[\s,_]/g, "").replace("−", "-").toLowerCase();
+    if (kind === "code") return /^\d{1,12}$/.test(g.replace(/[-.·]/g, ""));
     if (kind === "move") return (g.match(/[a-h][1-8]/g) || []).length === 2;
     if (kind === "fraction") return /^[+-]?\d{1,12}(\/\d{1,12})?$/.test(g) && !/\/0+$/.test(g);
     if (kind === "integer") return /^\d{1,15}$/.test(g);
     return false;
   }
-  const V_FORM = { move: "Two squares, from and to: a1h8.", fraction: "An exact fraction, like p/q.", integer: "A whole number." };
+  const V_FORM = { code: "A row of digits, one per dial.", move: "Two squares, from and to: a1h8.", fraction: "An exact fraction, like p/q.", integer: "A whole number." };
 
   async function sealFifth(e, cur) {
     e.preventDefault();
@@ -613,9 +607,6 @@
     $("who").innerHTML = `${esc(user.email || "")} · <button class="linkish" id="signout" type="button">leave</button>`;
     $("signout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
     render(); loadBoard();
-    let found = false;
-    try { found = localStorage.getItem(vKey()) === "1"; } catch (e) {}
-    if (state.solved_at && found) openFifth(false);
   }
 
   /* ---------- start ---------- */
@@ -672,11 +663,6 @@
       p = q; t += dt; steps++;
       if (steps % 25 === 0) p = resample(p, Math.max(24, Math.min(200, Math.round(len(p) / 0.015))));
     }
-    // the round point every curve shrinks to
-    let mx = 0, my = 0; p.forEach(([x, y]) => { mx += x; my += y; }); mx /= p.length; my /= p.length;
-    const door = document.getElementById('door');
-    door.style.left = (cv.offsetLeft + cx + mx * sc * 1.2) + 'px';
-    door.style.top = (cv.offsetTop + cy - my * sc) + 'px';
   }
   new ResizeObserver(draw).observe(cv.parentNode);
 })();
